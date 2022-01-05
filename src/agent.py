@@ -1,18 +1,26 @@
-"""VirusTotal agent implementation"""
+"""VirusTotal agent implementation : Agent responsible for scanning a file through the VirusTotal DB.
+Usage :
+trackerAgent = VirusTotalAgent(agent_def, agent_settings, api_key)
+trackerAgent.run()
+Please check the documentation for more details.
+"""
 import logging
 import hashlib
 from typing import Dict
 
+from virus_total_apis import PublicApi as VirusTotalPublicApi
+
 from ostorlab.agent import agent
 from ostorlab.agent import message as agent_message
-from virus_total_apis import PublicApi as VirusTotalPublicApi
 import utils
 
 
 logger = logging.getLogger(__name__)
 
+
 class OstorlabError(Exception):
     """Custom Error."""
+
 
 class VirusTotalApiError(OstorlabError):
     """VirtualTotalApiError."""
