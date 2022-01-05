@@ -6,6 +6,7 @@ from typing import Dict
 from ostorlab.agent import agent
 from ostorlab.agent import message as agent_message
 from virus_total_apis import PublicApi as VirusTotalPublicApi
+import utils
 
 
 logger = logging.getLogger(__name__)
@@ -69,6 +70,17 @@ class VirusTotalAgent(agent.Agent):
                 return 'high'
         return None
 
+    def _get_technical_details(self, scans:Dict) -> str:
+        """Method that returns a markdwon table of the virustotal scan.
+        Each row presents an antivirus with corresponding scan result : Malicious/Safe.
+        Args:
+            scans : Dictionary of the scans.
+        Returns:
+            technical_detail : markdown table of the scans results.
+        """
+        technical_detail = utils.table_markdown(scans)
+        return technical_detail
+
     def process(self, message: agent_message.Message) -> None:
         response = self._scan_file(message)
 
@@ -79,6 +91,13 @@ class VirusTotalAgent(agent.Agent):
 
         if scans:
             risk_rating = self._get_risk_rating(scans)
-            # self.emit()  : emit the risk rating.
-
-
+            technical_detail = self._get_technical_details(scans)
+            title = 'Some dummmy title to be checked later'
+            self.emit(
+                'v3.report.event.vulnerability',
+                {
+                    'title': title,
+                    'technical_detail': technical_detail,
+                    'risk_rating': risk_rating
+                }
+            )
