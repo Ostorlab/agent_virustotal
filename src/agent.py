@@ -1,18 +1,84 @@
-"""Sample agent implementation"""
-import ostorlab
+"""VirusTotal agent implementation"""
+import logging
+import hashlib
+from typing import Dict
 
-class HellWorldAgent(ostorlab.Agent):
-    """Hello world agent."""
+from ostorlab.agent import agent
+from ostorlab.agent import message as agent_message
+from virus_total_apis import PublicApi as VirusTotalPublicApi
 
-    def process(self, message: ostorlab.Message) -> None:
-        """TODO (author): add your description here.
 
+logger = logging.getLogger(__name__)
+
+class OstorlabError(Exception):
+    """Custom Error."""
+
+class VirusTotalApiError(OstorlabError):
+    """VirtualTotalApiError."""
+
+
+class VirusTotalAgent(agent.Agent):
+    """Agent responsible for scanning a file through the VirusTotal DB """
+
+    def __init__(self, agent_def, agent_settings, api_key: str) -> None:
+        """Init method.
         Args:
-            message:
-
-        Returns:
-
+            api_key : Key for the virustotal api.
         """
-        # TODO (author): implement agent logic here.
-        del message
-        self.emit('v3.healthcheck.ping', {'body': 'Hello World!'})
+        super().__init__(agent_def, agent_settings)
+        self.api_key = api_key
+
+
+    def _scan_file(self, message: agent_message.Message) -> Dict:
+        """Method responsible for scanning a file through the virustotal api.
+        Args:
+            message: Message containing the file to scan.
+        Returns:
+            response: The response of the virustotal scan.
+        """
+        file_md5_hash = hashlib.md5(message.file)
+        hash_hexa = file_md5_hash.hexdigest()
+        virustotal_client = VirusTotalPublicApi(self.api_key)
+
+        response = virustotal_client.get_file_report(hash_hexa)
+        return response
+
+    def _get_scans(self, response: Dict) -> Dict:
+        """Method that returns the scans from the virus total api response.
+        Args:
+            response: Dictionary of the api response.
+        Returns:
+            scans: Dictionary of the scans.
+        Raises:
+            VirusTotalApiError: In case the API request encountered problems.
+        """
+        if 'results' not in response:
+            raise VirusTotalApiError
+        elif response['results']['response_code'] == 1:
+            return response['results']['scans']
+        else:
+            return None
+
+    def _get_risk_rating(self, scans:Dict) -> str:
+        """Method responsible for assigning a risk level to the scanned file.
+        Returns:
+            'high' : if at least one anti-virus detected the file as a virus, else None.
+        """
+        for scanner_result in scans.values():
+            if scanner_result['detected']:
+                return 'high'
+        return None
+
+    def process(self, message: agent_message.Message) -> None:
+        response = self._scan_file(message)
+
+        try:
+            scans = self._get_scans(response)
+        except VirusTotalApiError:
+            logger.error('Virus Total api encountered some problems. Please try again.')
+
+        if scans:
+            risk_rating = self._get_risk_rating(scans)
+            # self.emit()  : emit the risk rating.
+
+
