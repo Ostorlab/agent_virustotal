@@ -49,7 +49,10 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     assert len(agent_mock[0].data['technical_detail']) != 0
 
 
-def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(mocker, virustotal_agent, message):
+def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
+    mocker,
+    virustotal_agent,
+    message):
     """Unittest for the lifecyle of the virustotal agent :
     Case where the virustotal pubic api response is invalid.
     """
