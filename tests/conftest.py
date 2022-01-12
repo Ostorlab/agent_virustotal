@@ -5,6 +5,7 @@ import pathlib
 from ostorlab.agent import message
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
+from ostorlab.utils import defintions as args_definitions
 
 from src import agent as virustotal_agent
 
@@ -26,7 +27,14 @@ def create_virustotal_agent():
     definition = agent_definitions.AgentDefinition(
         name='agent_virustotal',
         in_selectors = ['v3.healthcheck.ping', 'v3.asset.file'],
-        out_selectors=['v3.report.event.vulnerability']
+        out_selectors=['v3.report.event.vulnerability'],
+        args=[
+            args_definitions.Arg(
+                name='api_key',
+                type='string',
+                value='some_api_key',
+                description='Api key for the virus total API.')
+            ]
     )
 
     settings = runtime_definitions.AgentSettings(
@@ -38,7 +46,6 @@ def create_virustotal_agent():
     agent = virustotal_agent.VirusTotalAgent(
         definition,
         settings,
-        api_key='some_dumy_api_key'
     )
 
     return agent
