@@ -1,9 +1,4 @@
-"""VirusTotal agent implementation : Agent responsible for scanning a file through the VirusTotal DB.
-Usage :
-trackerAgent = VirusTotalAgent(agent_def, agent_settings, api_key)
-trackerAgent.run()
-Please check the documentation for more details.
-"""
+"""VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
 import logging
 from typing import Dict
 
@@ -16,14 +11,14 @@ from . import virustotal
 logger = logging.getLogger(__name__)
 
 class VirusTotalAgent(agent.Agent):
-    """Agent responsible for scanning a file through the VirusTotal DB."""
+    """Agent responsible for scanning a file through the Virus Total DB."""
 
     def __init__(self, agent_def, agent_settings, api_key: str) -> None:
         """Init method.
         Args:
             agent_def: Attributes of the agent.
             agent_settings: Settings of running instance of the agent.
-            api_key: Key for the virustotal public api.
+            api_key: Key for the Virus Total public API.
         """
         super().__init__(agent_def, agent_settings)
         self.api_key = api_key
@@ -35,7 +30,7 @@ class VirusTotalAgent(agent.Agent):
         try:
             scans = virustotal.get_scans(response)
         except virustotal.VirusTotalApiError as e:
-            logger.error('Virus Total api encountered some problems. Please try again.')
+            logger.error('Virus Total API encountered some problems. Please try again.')
             raise e
 
         if scans:
@@ -62,7 +57,7 @@ class VirusTotalAgent(agent.Agent):
         return 'SECURE'
 
     def _get_technical_details(self, scans:Dict) -> str:
-        """Method that returns a markdwon table of the virustotal scan.
+        """Method that returns a markdwon table of the Virus Total scan.
         Each row presents an antivirus with corresponding scan result : Malicious/Safe.
         Args:
             scans : Dictionary of the scans.
