@@ -6,6 +6,10 @@ in_selectors:
   - v3.asset.file
 out_selectors:
   - v3.report.event.vulnerability
+args:
+  - name: "api_key"
+    type: "string"
+    description: "Virus Total public API Key."
+    default_value: ""
 docker_file_path : Dockerfile
 docker_build_root : .
-
