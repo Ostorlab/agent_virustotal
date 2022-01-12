@@ -12,7 +12,7 @@ class Error(BaseException):
 class VirusTotalApiError(Error):
     """VirtualTotalApiError."""
 
-def scan_file(message: agent_message.Message, api_key: str) -> Dict:
+def scan_file_from_message(message: agent_message.Message, api_key: str) -> Dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
         message: Message containing the file to scan.
@@ -37,9 +37,7 @@ def get_scans(response: Dict) -> Dict:
     Raises:
         VirusTotalApiError: In case the API request encountered problems.
     """
-    # if 'results' not in response:
-    #     raise VirusTotalApiError
-    if response['response_code'] == 0:  #better than the lines before ?
+    if response['response_code'] == 0:
         raise VirusTotalApiError
     elif response['results']['response_code'] == 1:
         return response['results']['scans']
