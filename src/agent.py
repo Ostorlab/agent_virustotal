@@ -9,8 +9,8 @@ from typing import Dict
 
 from ostorlab.agent import agent
 from ostorlab.agent import message as agent_message
-from src import markdown
-from src  import virustotal
+from . import markdown
+from . import virustotal
 
 
 logger = logging.getLogger(__name__)
