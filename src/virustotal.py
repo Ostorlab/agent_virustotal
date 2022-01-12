@@ -1,4 +1,4 @@
-"""Module responsible for interacting with virustotal public api."""
+"""Module responsible for interacting with Virus Total public API."""
 from typing import Dict
 import hashlib
 
@@ -13,12 +13,12 @@ class VirusTotalApiError(Error):
     """VirtualTotalApiError."""
 
 def scan_file(message: agent_message.Message, api_key: str) -> Dict:
-    """Method responsible for scanning a file through the virustotal public api.
+    """Method responsible for scanning a file through the Virus Total public API.
     Args:
         message: Message containing the file to scan.
         api_key : Key for the virustotal api.
     Returns:
-        response: The response of the virustotal public api.
+        response: The response of the Virus Total public API.
     """
     file = message.data['content']
     file_md5_hash = hashlib.md5(file)
@@ -29,7 +29,7 @@ def scan_file(message: agent_message.Message, api_key: str) -> Dict:
 
 
 def get_scans(response: Dict) -> Dict:
-    """Method that returns the scans from the virustotal public api response.
+    """Method that returns the scans from the Virus Total public API response.
     Args:
         response: Dictionary of the api response.
     Returns:
