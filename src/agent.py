@@ -13,14 +13,15 @@ logger = logging.getLogger(__name__)
 class VirusTotalAgent(agent.Agent):
     """Agent responsible for scanning a file through the Virus Total DB."""
 
-    def __init__(self, agent_def, agent_settings, api_key: str) -> None:
+    def __init__(self, agent_def, agent_settings) -> None:
         """Init method.
         Args:
             agent_def: Attributes of the agent.
             agent_settings: Settings of running instance of the agent.
-            api_key: Key for the Virus Total public API.
         """
         super().__init__(agent_def, agent_settings)
+        api_key_arg = list(filter(lambda arg: arg.name == 'api_key', agent_def.args))
+        api_key = api_key_arg[0].value
         self.api_key = api_key
 
     def process(self, message: msg.Message) -> None:
@@ -29,7 +30,7 @@ class VirusTotalAgent(agent.Agent):
         assign a risk rating, a technical report
         and emits a message of type v3.report.vulnerability .
         """
-        response = virustotal.scan_file(message, self.api_key)
+        response = virustotal.scan_file_from_message(message, self.api_key)
 
         try:
             scans = virustotal.get_scans(response)
