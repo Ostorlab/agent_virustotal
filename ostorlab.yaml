@@ -10,6 +10,6 @@ args:
   - name: "api_key"
     type: "string"
     description: "Virus Total public API Key."
-    default_value: ""
+    value: "SOMEAPI_KEY"
 docker_file_path : Dockerfile
 docker_build_root : .
