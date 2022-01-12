@@ -9,13 +9,13 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     virustotal_agent,
     message):
     """Unittest for the lifecyle of the virustotal agent :
-    Sends a dummy malicious file through the virustotal public api,
+    Sends a dummy malicious file through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.event.vulnerability with the details above.
     """
 
     def virustotal_valid_response(message): # pylint: disable=W0613
-        """Method for mocking the virustotal public api valid response."""
+        """Method for mocking the Virus Total public API valid response."""
         response={
             'results':{
                 'scans':{
@@ -54,7 +54,7 @@ def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotal
     virustotal_agent,
     message):
     """Unittest for the lifecyle of the virustotal agent :
-    Case where the virustotal pubic api response is invalid.
+    Case where the Virus Total public API response is invalid.
     """
     def virustotal_invalid_response(message): # pylint: disable=W0613
         """Method for mocking the virustotal public api invalid response."""
