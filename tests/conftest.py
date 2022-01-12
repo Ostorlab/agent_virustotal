@@ -13,7 +13,7 @@ def create_scan_message():
     """Creates a dummy message of type v3.asset.file to be used by the agent for testing purposes.
     The files used is the EICAR Anti-Virus Test File.
     """
-    with open('files/malicious_dummy.com', 'rb') as f:
+    with open('./files/malicious_dummy.com', 'rb') as f:
         file_content = f.read()
         selector = 'v3.asset.file'
         msg_data = {'content': file_content, 'path': 'some/dummy/path'}
