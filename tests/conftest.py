@@ -14,10 +14,11 @@ def create_scan_message():
     """Creates a dummy message of type v3.asset.file to be used by the agent for testing purposes.
     The files used is the EICAR Anti-Virus Test File.
     """
-    file_content = (pathlib.Path.cwd() /'files/malicious_dummy.com').read_bytes()
+    file_content = (pathlib.Path(__file__).resolve().parents[0] / 'files/malicious_dummy.com').read_bytes()
     selector = 'v3.asset.file'
     msg_data = {'content': file_content, 'path': 'some/dummy/path'}
     return message.Message.from_data(selector, data=msg_data)
+
 
 @pytest.fixture(name='virustotal_agent')
 def create_virustotal_agent():
