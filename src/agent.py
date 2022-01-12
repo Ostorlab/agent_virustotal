@@ -3,7 +3,7 @@ import logging
 from typing import Dict
 
 from ostorlab.agent import agent
-from ostorlab.agent import message as agent_message
+from ostorlab.agent import message as msg
 from . import markdown
 from . import virustotal
 
@@ -23,7 +23,7 @@ class VirusTotalAgent(agent.Agent):
         super().__init__(agent_def, agent_settings)
         self.api_key = api_key
 
-    def process(self, message: agent_message.Message) -> None:
+    def process(self, message: msg.Message) -> None:
         """Overriden message processing method."""
         response = virustotal.scan_file(message, self.api_key)
 
