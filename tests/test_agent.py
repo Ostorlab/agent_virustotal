@@ -11,7 +11,7 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     """Unittest for the lifecyle of the virustotal agent :
     Sends a dummy malicious file through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
-    and finally emits a message of type v3.report.event.vulnerability with the details above.
+    and finally emits a message of type v3.report.vulnerability with the details above.
     """
 
     def virustotal_valid_response(message): # pylint: disable=W0613
@@ -42,7 +42,7 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     except virustotal.VirusTotalApiError:
         pytest.fail('Unexpected VirusTotalApiError because response is returned with status 200.')
     assert len(agent_mock) == 1
-    assert agent_mock[0].selector == 'v3.report.event.vulnerability'
+    assert agent_mock[0].selector == 'v3.report.vulnerability'
     assert agent_mock[0].data['risk_rating'] == 'HIGH'
     assert agent_mock[0].data['title'] == 'VirusTotal report'
     assert isinstance(agent_mock[0].data['technical_detail'], str)

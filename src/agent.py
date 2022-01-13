@@ -43,7 +43,7 @@ class VirusTotalAgent(agent.Agent):
             technical_detail = process_scans.get_technical_details(scans)
             title = 'VirusTotal report'
             self.emit(
-                'v3.report.event.vulnerability',
+                'v3.report.vulnerability',
                 {
                     'title': title,
                     'technical_detail': technical_detail,

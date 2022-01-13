@@ -5,7 +5,7 @@ description: Agent responsible for scanning files through the Virus Total public
 in_selectors:
   - v3.asset.file
 out_selectors:
-  - v3.report.event.vulnerability
+  - v3.report.vulnerability
 args:
   - name: "api_key"
     type: "string"
