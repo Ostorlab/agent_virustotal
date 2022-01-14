@@ -20,15 +20,18 @@ class VirusTotalAgent(agent.Agent):
             agent_settings: Settings of running instance of the agent.
         """
         super().__init__(agent_def, agent_settings)
-        api_key_arg = list(filter(lambda arg: arg.name == 'api_key', agent_def.args))
-        api_key = api_key_arg[0].value
-        self.api_key = api_key
+        self.api_key = self.args.get('api_key')
 
     def process(self, message: msg.Message) -> None:
         """Process message of type v3.asset.file;
         scan the file content throught the Virus Total public API,
         assign a risk rating, a technical report
         and emits a message of type v3.report.vulnerability .
+        Args:
+            message: Message containing the file to scan.
+        Raises:
+            VirusTotalApiError: In case the Virus Total api encountered problems.
+            NameError: In case the scans were not defined.
         """
         response = virustotal.scan_file_from_message(message, self.api_key)
 
@@ -38,7 +41,7 @@ class VirusTotalAgent(agent.Agent):
             logger.error('Virus Total API encountered some problems. Please try again.')
             raise e
 
-        if scans:
+        try:
             risk_rating = process_scans.get_risk_rating(scans)
             technical_detail = process_scans.get_technical_details(scans)
             title = 'VirusTotal report'
@@ -50,3 +53,6 @@ class VirusTotalAgent(agent.Agent):
                     'risk_rating': risk_rating
                 }
             )
+        except NameError() as e:
+            logger.error('The scans list is empty.')
+            raise e
