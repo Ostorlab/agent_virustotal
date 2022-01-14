@@ -2,7 +2,7 @@
 from typing import Dict
 import hashlib
 
-from virus_total_apis import PublicApi as VirusTotalPublicApi
+import virus_total_apis
 from ostorlab.agent import message as agent_message
 
 class Error(BaseException):
@@ -23,7 +23,7 @@ def scan_file_from_message(message: agent_message.Message, api_key: str) -> Dict
     file = message.data['content']
     file_md5_hash = hashlib.md5(file)
     hash_hexa = file_md5_hash.hexdigest()
-    virustotal_client = VirusTotalPublicApi(api_key)
+    virustotal_client = virus_total_apis.PublicApi(api_key)
     response = virustotal_client.get_file_report(hash_hexa)
     return response
 
