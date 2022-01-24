@@ -3,6 +3,7 @@ import logging
 
 from ostorlab.agent import agent
 from ostorlab.agent import message as msg
+from ostorlab.agent.kb import kb
 
 from . import virustotal
 from . import process_scans
@@ -44,7 +45,7 @@ class VirusTotalAgent(agent.Agent):
         try:
             risk_rating = process_scans.get_risk_rating(scans)
             technical_detail = process_scans.get_technical_details(scans)
-            title = 'VirusTotal report'
+            title = kb.Kb.VIRUSTOTAL_SCAN
             self.emit(
                 'v3.report.vulnerability',
                 {
