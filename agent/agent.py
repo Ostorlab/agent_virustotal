@@ -46,23 +46,22 @@ class VirusTotalAgent(agent.Agent):
             raise e
 
         try:
-            risk_rating = process_scans.get_risk_rating(scans)
-            technical_detail = process_scans.get_technical_details(scans)
-            title = kb.VIRUSTOTAL_SCAN
-            self.emit(
-                'v3.report.vulnerability',
-                {
-                    'title': title,
-                    'technical_detail': technical_detail,
-                    'risk_rating': risk_rating
-                }
-            )
+            if scans:
+                risk_rating = process_scans.get_risk_rating(scans)
+                technical_detail = process_scans.get_technical_details(scans)
+                title = kb.VIRUSTOTAL_SCAN
+                self.emit(
+                    'v3.report.vulnerability',
+                    {
+                        'title': title,
+                        'technical_detail': technical_detail,
+                        'risk_rating': risk_rating
+                    }
+                )
         except NameError() as e:
             logger.error('The scans list is empty.')
             raise e
 
-
-import time
 if __name__ == '__main__':
-    VirusTotalAgent.main(['--definition', '/app/agent/ostorlab.yaml', '--settings', '/tmp/settings.binproto'])
-    
+    logger.info('starting agent ...')
+    VirusTotalAgent.main()

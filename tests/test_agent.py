@@ -1,7 +1,7 @@
 """Unittests for virustotal agent."""
 import pytest
 
-from src import virustotal
+from agent import virustotal
 
 def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
     mocker,

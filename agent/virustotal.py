@@ -5,7 +5,7 @@ import hashlib
 import virus_total_apis
 from ostorlab.agent import message as agent_message
 
-class Error(BaseException):
+class Error(Exception):
     """Custom Error."""
 
 
@@ -20,7 +20,7 @@ def scan_file_from_message(message: agent_message.Message, api_key: str) -> Dict
     Returns:
         response: The response of the Virus Total public API.
     """
-    file = message.data['content']
+    file = message.data['content'].encode('utf-8')
     file_md5_hash = hashlib.md5(file)
     hash_hexa = file_md5_hash.hexdigest()
     virustotal_client = virus_total_apis.PublicApi(api_key)
@@ -37,7 +37,7 @@ def get_scans(response: Dict) -> Dict:
     Raises:
         VirusTotalApiError: In case the API request encountered problems.
     """
-    if response['response_code'] == 0:
+    if response['response_code'] == 0 or 'results' not in response:
         raise VirusTotalApiError
     elif response['results']['response_code'] == 1:
         return response['results']['scans']
