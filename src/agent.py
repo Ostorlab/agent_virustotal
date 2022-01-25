@@ -3,24 +3,27 @@ import logging
 
 from ostorlab.agent import agent
 from ostorlab.agent import message as msg
-from ostorlab.agent.kb import kb
+from ostorlab.agent import kb
 
-from . import virustotal
-from . import process_scans
-
+# from . import virustotal
+# from . import process_scans
+import virustotal
+import process_scans
 
 logger = logging.getLogger(__name__)
+#logger.setLevel('debug')
+
 
 class VirusTotalAgent(agent.Agent):
     """Agent responsible for scanning a file through the Virus Total DB."""
 
-    def __init__(self, agent_def, agent_settings) -> None:
+    def __init__(self, agent_definition, agent_settings) -> None:
         """Init method.
         Args:
             agent_def: Attributes of the agent.
             agent_settings: Settings of running instance of the agent.
         """
-        super().__init__(agent_def, agent_settings)
+        super().__init__(agent_definition=agent_definition, agent_settings=agent_settings)
         self.api_key = self.args.get('api_key')
 
     def process(self, message: msg.Message) -> None:
@@ -45,7 +48,7 @@ class VirusTotalAgent(agent.Agent):
         try:
             risk_rating = process_scans.get_risk_rating(scans)
             technical_detail = process_scans.get_technical_details(scans)
-            title = kb.Kb.VIRUSTOTAL_SCAN
+            title = kb.VIRUSTOTAL_SCAN
             self.emit(
                 'v3.report.vulnerability',
                 {
@@ -57,3 +60,9 @@ class VirusTotalAgent(agent.Agent):
         except NameError() as e:
             logger.error('The scans list is empty.')
             raise e
+
+
+import time
+if __name__ == '__main__':
+    VirusTotalAgent.main(['--definition', '/app/agent/ostorlab.yaml', '--settings', '/tmp/settings.binproto'])
+    
