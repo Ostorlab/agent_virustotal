@@ -7,7 +7,7 @@ from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 from ostorlab.utils import defintions as args_definitions
 
-from src import agent as virustotal_agent
+from agent import agent as virustotal_agent
 
 
 @pytest.fixture(name='message')
@@ -32,7 +32,7 @@ def create_virustotal_agent():
             args_definitions.Arg(
                 name='api_key',
                 type='string',
-                value='some_api_key',
+                value=b'some_api_key',
                 description='Api key for the virus total API.')
             ]
     )
