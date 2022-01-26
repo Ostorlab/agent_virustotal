@@ -1,3 +1,4 @@
 ostorlab
 virustotal-api
 pytablewriter
+markdown
