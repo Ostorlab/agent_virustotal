@@ -20,7 +20,7 @@ def scan_file_from_message(message: agent_message.Message, api_key: str) -> Dict
     Returns:
         response: The response of the Virus Total public API.
     """
-    file = message.data['content'].encode('utf-8')
+    file = message.data['content']
     file_md5_hash = hashlib.md5(file)
     hash_hexa = file_md5_hash.hexdigest()
     virustotal_client = virus_total_apis.PublicApi(api_key)
