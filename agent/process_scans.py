@@ -1,8 +1,8 @@
 """Processing scans returned by the Virus Total Public API."""
 from typing import Dict
 
-# from . import markdown
-import markdown
+from agent import markdown
+
 
 def get_risk_rating(scans:Dict) -> str:
     """Assign risk level based on scanned file report.
