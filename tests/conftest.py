@@ -7,7 +7,7 @@ from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 from ostorlab.utils import defintions as args_definitions
 
-from agent import agent as virustotal_agent
+import agent as virustotal_agent
 
 
 @pytest.fixture(name='message')

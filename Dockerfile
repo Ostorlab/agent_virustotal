@@ -9,9 +9,5 @@ COPY --from=builder /install /usr/local
 RUN mkdir -p /app/agent
 COPY agent /app/agent
 COPY ostorlab.yaml /app/agent/ostorlab.yaml
-RUN mkdir -p /app/ostorlab
-COPY ostorlab_client /app/ostorlab
-WORKDIR /app/ostorlab
-RUN python3 -m pip install .
-WORKDIR /app/agent
+WORKDIR /app
 CMD ["python3", "/app/agent/agent.py"]

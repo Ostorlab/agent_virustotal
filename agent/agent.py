@@ -5,13 +5,10 @@ from ostorlab.agent import agent
 from ostorlab.agent import message as msg
 from ostorlab.agent import kb
 
-# from . import virustotal
-# from . import process_scans
-import virustotal
-import process_scans
+from agent import virustotal
+from agent import process_scans
 
 logger = logging.getLogger(__name__)
-#logger.setLevel('debug')
 
 
 class VirusTotalAgent(agent.Agent):
@@ -61,6 +58,7 @@ class VirusTotalAgent(agent.Agent):
         except NameError() as e:
             logger.error('The scans list is empty.')
             raise e
+
 
 if __name__ == '__main__':
     logger.info('starting agent ...')
