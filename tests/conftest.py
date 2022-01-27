@@ -25,14 +25,14 @@ def create_virustotal_agent():
     """Instantiate a virustotal agent."""
     definition = agent_definitions.AgentDefinition(
         name='agent_virustotal',
-        in_selectors = ['v3.asset.file'],
+        in_selectors=['v3.asset.file'],
         out_selectors=['v3.report.vulnerability'],
         args=[
             {
-                'name':'api_key',
-                'type':'string',
-                'value':'some_api_key',
-                'description':'Api key for the virus total API.'
+                'name': 'api_key',
+                'type': 'string',
+                'value': 'some_api_key',
+                'description': 'Api key for the virus total API.'
             }]
     )
 

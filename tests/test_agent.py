@@ -3,23 +3,24 @@ import pytest
 
 from agent import virustotal
 
+
 def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
-    mocker,
-    agent_mock,
-    virustotal_agent,
-    message):
+        mocker,
+        agent_mock,
+        virustotal_agent,
+        message):
     """Unittest for the lifecyle of the virustotal agent :
     Sends a dummy malicious file through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
 
-    def virustotal_valid_response(message): # pylint: disable=W0613
+    def virustotal_valid_response(message):  # pylint: disable=W0613
         """Method for mocking the Virus Total public API valid response."""
-        response={
-            'results':{
-                'scans':{
-                    'Bkav':{
+        response = {
+            'results': {
+                'scans': {
+                    'Bkav': {
                         'detected': False, 'version': '1.3.0.9899', 'result': None, 'update': '20220107'
                     },
                     'Elastic': {
@@ -49,23 +50,26 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     assert agent_mock[0].data['short_description'] == 'VirusTotal Malware analysis'
     assert agent_mock[0].data['privacy_issue']
     assert agent_mock[0].data['security_issue']
-    assert agent_mock[0].data['references'] == [{'title':'Virustotal', 'url':'https://www.virustotal.com/'}]
+    assert agent_mock[0].data['references'] == [{'title': 'Virustotal', 'url': 'https://www.virustotal.com/'}]
 
 
 def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
-    mocker,
-    virustotal_agent,
-    message):
+        mocker,
+        virustotal_agent,
+        message):
     """Unittest for the lifecyle of the virustotal agent :
     Case where the Virus Total public API response is invalid.
     """
-    def virustotal_invalid_response(message): # pylint: disable=W0613
+
+    def virustotal_invalid_response(message):
         """Method for mocking the virustotal public api invalid response."""
+        del message
         return {
             'response_code': 0,
-            'resource': 'some_wrong_ressorce_id',
+            'resource': 'some_wrong_resource_id',
             'verbose_msg': 'Invalid resource, check what you are submitting'
         }
+
     mocker.patch('virus_total_apis.PublicApi.get_file_report', side_effect=virustotal_invalid_response)
 
     with pytest.raises(virustotal.VirusTotalApiError):
