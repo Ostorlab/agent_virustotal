@@ -1,9 +1,15 @@
 kind: Agent
-name: template_agent # Agent name, must be unique by organisation to be published on the store.
-version: 0.0.0
-description: Agent description. # Support for Markdown format.
-in_selectors: # List of input selectors.
-  - v3.healthcheck.ping
-out_selectors: [] # List of output selectors.
-docker_file_path : Dockerfile # Dockerfile path for automated release build.
-docker_build_root : . # Docker build dir for automated release build.
+name: virustotal_agent
+version: 0.0.1
+description: Agent responsible for scanning files through the Virus Total public API.
+in_selectors:
+  - v3.asset.file
+out_selectors:
+  - v3.report.vulnerability
+args:
+  - name: "api_key"
+    type: "string"
+    description: "Virus Total public API Key."
+    value: "__ADD_API_KEY_HERE__"
+docker_file_path : Dockerfile
+docker_build_root : .

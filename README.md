@@ -1,13 +1,7 @@
-# Template to create agents.
+# Agent VirusTotal
 
-## How to :
-* Create a repository from base_agent template.
-* git remote add template https://github.com/Ostorlab/template_agent.git
+Agent responsible for receiving files, scanning them through the virustotal public api and sending back a report.
 
+# Instruction
 
-**In case new changes are made to the template**
-
-
-* git fetch template
-* git checkout [branch-to-merge-to]
-* git merge template/main
+Pass API key of Virus Total service in the agent argument. For more detail, check Ostorlab agent documentation.
