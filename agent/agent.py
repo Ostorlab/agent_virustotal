@@ -13,7 +13,7 @@ from agent import process_scans
 logger = logging.getLogger(__name__)
 
 
-class VirusTotalAgent(agent_report_vulnerability_mixin.AgentReportVulnMixin, agent.Agent):
+class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin):
     """Agent responsible for scanning a file through the Virus Total DB."""
 
     def __init__(self, agent_definition, agent_settings) -> None:
@@ -47,7 +47,7 @@ class VirusTotalAgent(agent_report_vulnerability_mixin.AgentReportVulnMixin, age
         try:
             technical_detail = process_scans.get_technical_details(scans)
             risk_rating = process_scans.get_risk_rating(scans)
-            self.send_vulnerability_message(
+            self.report_vulnerability(
                 entry=knowledge_base.KB.VIRUSTOTAL_SCAN,
                 technical_detail=technical_detail,
                 risk_rating=risk_rating,
