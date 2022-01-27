@@ -4,7 +4,7 @@ import logging
 from ostorlab.agent import agent
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.agent import message as msg
-from ostorlab.agent.kb import kb as knowledge_base
+from ostorlab.agent.kb import kb
 
 from agent import virustotal
 from agent import process_scans
@@ -48,7 +48,7 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             technical_detail = process_scans.get_technical_details(scans)
             risk_rating = process_scans.get_risk_rating(scans)
             self.report_vulnerability(
-                entry=knowledge_base.KB.VIRUSTOTAL_SCAN,
+                entry=kb.KB.VIRUSTOTAL_SCAN,
                 technical_detail=technical_detail,
                 risk_rating=risk_rating,
                 dna='some_dna')
