@@ -2,16 +2,18 @@
 import logging
 
 from ostorlab.agent import agent
+from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.agent import message as msg
-from ostorlab.agent import kb
+from ostorlab.agent.kb import kb as knowledge_base
 
 from agent import virustotal
 from agent import process_scans
 
+
 logger = logging.getLogger(__name__)
 
 
-class VirusTotalAgent(agent.Agent):
+class VirusTotalAgent(agent_report_vulnerability_mixin.AgentReportVulnMixin, agent.Agent):
     """Agent responsible for scanning a file through the Virus Total DB."""
 
     def __init__(self, agent_definition, agent_settings) -> None:
@@ -43,23 +45,18 @@ class VirusTotalAgent(agent.Agent):
             raise e
 
         try:
-            if scans:
-                risk_rating = process_scans.get_risk_rating(scans)
-                technical_detail = process_scans.get_technical_details(scans)
-                title = kb.VIRUSTOTAL_SCAN
-                self.emit(
-                    'v3.report.vulnerability',
-                    {
-                        'title': title,
-                        'technical_detail': technical_detail,
-                        'risk_rating': risk_rating
-                    }
-                )
-        except NameError() as e:
+            technical_detail = process_scans.get_technical_details(scans)
+            risk_rating = process_scans.get_risk_rating(scans)
+            self.send_vulnerability_message(
+                entry=knowledge_base.KB.VIRUSTOTAL_SCAN,
+                technical_detail=technical_detail,
+                risk_rating=risk_rating,
+                dna='some_dna')
+        except NameError as e:
             logger.error('The scans list is empty.')
             raise e
 
 
 if __name__ == '__main__':
-    logger.info('starting agent ...')
+    logger.debug('Virus total starting..')
     VirusTotalAgent.main()
