@@ -6,7 +6,7 @@ from ostorlab.agent import message
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 
-from agent import agent as virustotal_agent
+from agent import virus_total_agent
 
 
 @pytest.fixture(name='message')
@@ -42,7 +42,7 @@ def create_virustotal_agent():
         bus_exchange_topic='NA',
     )
 
-    agent = virustotal_agent.VirusTotalAgent(
+    agent = virus_total_agent.VirusTotalAgent(
         definition,
         settings,
     )
