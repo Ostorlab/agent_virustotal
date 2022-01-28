@@ -15,8 +15,9 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
 
-    def virustotal_valid_response(message):  # pylint: disable=W0613
+    def virustotal_valid_response(message):
         """Method for mocking the Virus Total public API valid response."""
+        del message
         response = {
             'results': {
                 'scans': {
