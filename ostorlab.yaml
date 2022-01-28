@@ -1,5 +1,5 @@
 kind: Agent
-name: virustotal_agent
+name: virustotal
 version: 0.0.1
 description: Agent responsible for scanning files through the Virus Total public API.
 in_selectors:
