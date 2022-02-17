@@ -51,8 +51,7 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             self.report_vulnerability(
                 entry=kb.KB.VIRUSTOTAL_SCAN,
                 technical_detail=technical_detail,
-                risk_rating=risk_rating,
-                dna='some_dna')
+                risk_rating=risk_rating)
         except NameError:
             logger.error('The scans list is empty.')
             raise
