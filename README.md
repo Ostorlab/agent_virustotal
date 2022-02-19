@@ -1,7 +1,7 @@
 
 # Agent Virus Total
 ![enter image description here](https://github.com/Ostorlab/agent_virus_total/blob/README/images/logo.png)
-An implementation of [Osorlab Agent]((https://pypi.org/project/ostorlab/) for the [Nmap](https://nmap.org/).    
+An implementation of [Osorlab Agent](https://pypi.org/project/ostorlab/) for the [Nmap](https://nmap.org/).    
   
 ## Usage  
   
