@@ -21,10 +21,10 @@ This repository is an implementation of the VirusTotal agent.
 ## Getting Started
 To perform your first scan, simply run the following command.
 ```shell
-ostorlab scan run --install --agents agent/ostorlab/virustotal ip 8.8.8.8
+ostorlab scan run --install --agents agent/ostorlab/virustotal file malware.exe
 ```
 
-This command will download and install `agent/ostorlab/virustotal` and target the ip `8.8.8.8`.
+This command will download and install `agent/ostorlab/virustotal` and targets the file `malware.exe`.
 For more information, please refer to the [Ostorlab Documentation](https://github.com/Ostorlab/ostorlab/blob/main/README.md)
 
 
@@ -40,7 +40,7 @@ Agent VirusTotal can be installed directly from the ostorlab agent store or buil
 
 You can then run the agent with the following command:
 ```shell
-ostorlab scan run --agents agent/ostorlab/virustotal ip 8.8.8.8
+ostorlab scan run --agents agent/ostorlab/virustotal file malware.exe
 ```
 
 
@@ -68,11 +68,11 @@ git clone https://github.com/Ostorlab/agent_virus_total.git && cd agent_virus_to
  4. Run the agent using one of the following commands:
 	 * If you did not specify an organization when building the image:
       ```shell
-      ostorlab scan run --agents agent//virustotal ip 8.8.8.8
+      ostorlab scan run --agents agent//virustotal file malware.exe
       ```
 	 * If you specified an organization when building the image:
       ```shell
-      ostorlab scan run --agents agent/[ORGANIZATION]/virustotal ip 8.8.8.8
+      ostorlab scan run --agents agent/[ORGANIZATION]/virustotal file malware.exe
       ```
 
 
