@@ -66,6 +66,8 @@ description: |
   ## License
   [Apache](./LICENSE)
 
+license: Apache
+source: https://github.com/Ostorlab/agent_virus_total
 in_selectors:
   - v3.asset.file
 out_selectors:
