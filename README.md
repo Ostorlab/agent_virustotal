@@ -68,11 +68,11 @@ git clone https://github.com/Ostorlab/agent_virus_total.git && cd agent_virus_to
  4. Run the agent using one of the following commands:
 	 * If you did not specify an organization when building the image:
       ```shell
-      ostorlab scan run --agents agent//virustotal file malware.exe
+      ostorlab scan run --agent agent//virustotal file malware.exe
       ```
 	 * If you specified an organization when building the image:
       ```shell
-      ostorlab scan run --agents agent/[ORGANIZATION]/virustotal file malware.exe
+      ostorlab scan run --agent agent/[ORGANIZATION]/virustotal file malware.exe
       ```
 
 
