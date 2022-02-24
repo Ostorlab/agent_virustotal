@@ -38,8 +38,8 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
-        logger.info('Processing message of type : %s', message.selector)
-        logger.info('Scanning the file through the Virus Total DB.')
+        logger.info('Processing message of selector : %s', message.selector)
+        logger.info('Scanning the file with the Virustotal API.')
         response = virustotal.scan_file_from_message(message, self.api_key)
 
         try:
@@ -50,7 +50,6 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
 
         technical_detail = process_scans.get_technical_details(scans)
         risk_rating = process_scans.get_risk_rating(scans)
-        logger.info('Reporting vulnerability : %s', kb.KB.VIRUSTOTAL_SCAN.title)
         self.report_vulnerability(entry=kb.KB.VIRUSTOTAL_SCAN,
                                   technical_detail=technical_detail,
                                   risk_rating=risk_rating)
