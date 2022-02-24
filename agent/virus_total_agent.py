@@ -6,12 +6,19 @@ from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.agent import message as msg
 from ostorlab.agent.kb import kb
 from ostorlab.runtimes import definitions as runtime_definitions
+from rich import logging as rich_logging
 
 from agent import virustotal
 from agent import process_scans
 
+
+logging.basicConfig(
+    format='%(message)s',
+    datefmt='[%X]',
+    handlers=[rich_logging.RichHandler(rich_tracebacks=True)],
+    level='INFO'
+)
 logger = logging.getLogger(__name__)
-logger.setLevel('INFO')
 
 
 class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin):
@@ -38,14 +45,14 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
-        logger.info('Processing message of selector : %s', message.selector)
-        logger.info('Scanning the file with the Virustotal API.')
+        logger.info('processing message of selector : %s', message.selector)
+        logger.info('scanning the file with the Virustotal API.')
         response = virustotal.scan_file_from_message(message, self.api_key)
 
         try:
             scans = virustotal.get_scans(response)
         except virustotal.VirusTotalApiError:
-            logger.error('Virus Total API encountered some problems. Please try again.')
+            logger.error('virustotal API encountered some problems. Please try again.')
             raise
 
         technical_detail = process_scans.get_technical_details(scans)
@@ -56,5 +63,5 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
 
 
 if __name__ == '__main__':
-    logger.info('Virus total starting..')
+    logger.info('starting agent..')
     VirusTotalAgent.main()
