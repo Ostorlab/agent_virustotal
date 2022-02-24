@@ -11,6 +11,7 @@ from agent import virustotal
 from agent import process_scans
 
 logger = logging.getLogger(__name__)
+logger.setLevel('INFO')
 
 
 class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin):
@@ -37,6 +38,8 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
+        logger.info('Processing message of type : %s', message.selector)
+        logger.info('Scanning the file through the Virus Total DB.')
         response = virustotal.scan_file_from_message(message, self.api_key)
 
         try:
@@ -47,11 +50,12 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
 
         technical_detail = process_scans.get_technical_details(scans)
         risk_rating = process_scans.get_risk_rating(scans)
+        logger.info('Reporting vulnerability : %s', kb.KB.VIRUSTOTAL_SCAN.title)
         self.report_vulnerability(entry=kb.KB.VIRUSTOTAL_SCAN,
                                   technical_detail=technical_detail,
                                   risk_rating=risk_rating)
 
 
 if __name__ == '__main__':
-    logger.debug('Virus total starting..')
+    logger.info('Virus total starting..')
     VirusTotalAgent.main()
