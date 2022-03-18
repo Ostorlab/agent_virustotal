@@ -1,7 +1,8 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
 import logging
 
-from ostorlab.agent import agent, definitions as agent_definitions
+from ostorlab.agent import agent
+from ostorlab.agent import definitions as agent_definitions
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.agent import message as msg
 from ostorlab.agent.kb import kb
