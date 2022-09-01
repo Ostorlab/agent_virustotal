@@ -4,7 +4,7 @@ import logging
 from ostorlab.agent import agent
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
-from ostorlab.agent import message as msg
+from ostorlab.agent.message import message as msg
 from ostorlab.agent.kb import kb
 from ostorlab.runtimes import definitions as runtime_definitions
 from rich import logging as rich_logging
