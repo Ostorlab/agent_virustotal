@@ -3,7 +3,7 @@ from typing import Dict, Optional
 import hashlib
 
 import virus_total_apis
-from ostorlab.agent import message as agent_message
+from ostorlab.agent.message import message as agent_message
 
 
 class Error(Exception):
