@@ -36,6 +36,6 @@ def table_markdown(data: List[List[str]]) -> str:
     markdown_writer.stream = io.StringIO()
     markdown_writer.write_table()
     table = markdown_writer.stream.getvalue()
-    table = table.replace('\n', '  \n')  # Two spaces \n for a new line  in markdown.
+    table = table.replace("\n", "  \n")  # Two spaces \n for a new line  in markdown.
 
     return table
