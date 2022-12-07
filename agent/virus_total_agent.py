@@ -13,18 +13,23 @@ from agent import virustotal
 logger = logging.getLogger(__name__)
 
 
-class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin):
+class VirusTotalAgent(
+    agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin
+):
     """Agent responsible for scanning a file through the Virus Total DB."""
 
-    def __init__(self, agent_definition: agent_definitions.AgentDefinition,
-                 agent_settings: runtime_definitions.AgentSettings) -> None:
+    def __init__(
+        self,
+        agent_definition: agent_definitions.AgentDefinition,
+        agent_settings: runtime_definitions.AgentSettings,
+    ) -> None:
         """Init method.
         Args:
             agent_definition: Attributes of the agent.
             agent_settings: Settings of running instance of the agent.
         """
         super().__init__(agent_definition, agent_settings)
-        self.api_key = self.args.get('api_key')
+        self.api_key = self.args.get("api_key")
 
     def process(self, message: msg.Message) -> None:
         """Process message of type v3.asset.file. Scan the file content through the Virus Total public API, assign a
@@ -42,7 +47,7 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
         try:
             scans = virustotal.get_scans(response)
         except virustotal.VirusTotalApiError:
-            logger.error('Virus Total API encountered some problems. Please try again.')
+            logger.error("Virus Total API encountered some problems. Please try again.")
             raise
 
         try:
@@ -51,12 +56,13 @@ class VirusTotalAgent(agent.Agent, agent_report_vulnerability_mixin.AgentReportV
             self.report_vulnerability(
                 entry=kb.KB.VIRUSTOTAL_SCAN,
                 technical_detail=technical_detail,
-                risk_rating=risk_rating)
+                risk_rating=risk_rating,
+            )
         except NameError:
-            logger.error('The scans list is empty.')
+            logger.error("The scans list is empty.")
             raise
 
 
-if __name__ == '__main__':
-    logger.debug('Virus total starting..')
+if __name__ == "__main__":
+    logger.debug("Virus total starting..")
     VirusTotalAgent.main()

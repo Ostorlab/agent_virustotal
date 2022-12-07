@@ -22,7 +22,7 @@ def scan_file_from_message(message: msg.Message, api_key: str) -> Dict:
     Returns:
         response: The response of the Virus Total public API.
     """
-    file = message.data['content']
+    file = message.data["content"]
     file_md5_hash = hashlib.md5(file)
     hash_hexa = file_md5_hash.hexdigest()
     virustotal_client = virus_total_apis.PublicApi(api_key)
@@ -42,9 +42,9 @@ def get_scans(response: Dict) -> Optional[Dict]:
     Raises:
         VirusTotalApiError: In case the API request encountered problems.
     """
-    if response['response_code'] == 0 or 'results' not in response:
+    if response["response_code"] == 0 or "results" not in response:
         raise VirusTotalApiError()
-    elif response['results']['response_code'] == 1:
-        return response['results']['scans']
+    elif response["results"]["response_code"] == 1:
+        return response["results"]["scans"]
     else:
         return None

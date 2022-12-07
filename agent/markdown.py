@@ -16,7 +16,7 @@ def prepare_data_for_markdown_formatting(scans: Dict) -> List[List[str]]:
     """
     data = []
     for antivirus, result in scans.items():
-        status = '_Malicous_' if result['detected'] is True else '_Safe_'
+        status = "_Malicous_" if result["detected"] is True else "_Safe_"
         row = [antivirus, status]
         data.append(row)
     return data
@@ -31,11 +31,8 @@ def table_markdown(data: List[List[str]]) -> str:
     Returns:
         table: Complete markdown table
     """
-    headers = ['Package', 'Result']
-    markdown_writer = MarkdownTableWriter(
-        headers=headers,
-        value_matrix=data
-    )
+    headers = ["Package", "Result"]
+    markdown_writer = MarkdownTableWriter(headers=headers, value_matrix=data)
     markdown_writer.stream = io.StringIO()
     markdown_writer.write_table()
     table = markdown_writer.stream.getvalue()
