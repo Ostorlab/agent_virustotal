@@ -12,7 +12,7 @@ def get_risk_rating(scans: Dict) -> agent_report_vulnerability_mixin.RiskRating:
         'HIGH' if at least one anti-virus detected the file as a virus, else Secure.
     """
     for scanner_result in scans.values():
-        if scanner_result['detected']:
+        if scanner_result["detected"]:
             return agent_report_vulnerability_mixin.RiskRating.HIGH
     return agent_report_vulnerability_mixin.RiskRating.HIGH
 
