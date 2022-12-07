@@ -1,9 +1,9 @@
 """Pytest fixtures for the virustotal agent."""
-import pytest
 import pathlib
 
-from ostorlab.agent.message import message as msg
+import pytest
 from ostorlab.agent import definitions as agent_definitions
+from ostorlab.agent.message import message as msg
 from ostorlab.runtimes import definitions as runtime_definitions
 
 from agent import virus_total_agent
@@ -15,7 +15,7 @@ def create_scan_message():
     The files used is the EICAR Anti-Virus Test File.
     """
     file_content = (
-        pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
+            pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file"
     msg_data = {"content": file_content, "path": "some/dummy/path"}

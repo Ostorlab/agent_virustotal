@@ -1,3 +1,4 @@
-ostorlab
+ostorlab[agent]
 virustotal-api
 pytablewriter
+rich
