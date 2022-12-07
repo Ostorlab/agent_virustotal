@@ -2,7 +2,7 @@
 import pytest
 import pathlib
 
-from ostorlab.agent import message
+from ostorlab.agent.message import message as msg
 from ostorlab.agent import definitions as agent_definitions
 from ostorlab.runtimes import definitions as runtime_definitions
 
@@ -17,7 +17,7 @@ def create_scan_message():
     file_content = (pathlib.Path(__file__).parents[0] / 'files/malicious_dummy.com').read_bytes()
     selector = 'v3.asset.file'
     msg_data = {'content': file_content, 'path': 'some/dummy/path'}
-    return message.Message.from_data(selector, data=msg_data)
+    return msg.Message.from_data(selector, data=msg_data)
 
 
 @pytest.fixture(name='virustotal_agent')

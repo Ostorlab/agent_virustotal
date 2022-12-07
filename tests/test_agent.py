@@ -48,7 +48,7 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     assert agent_mock[0].data['risk_rating'] == 'HIGH'
     assert agent_mock[0].data['title'] == 'Virustotal malware analysis (MD5 based search)'
     assert isinstance(agent_mock[0].data['technical_detail'], str)
-    assert agent_mock[0].data['short_description'] == 'VirusTotal Malware analysis'
+    assert agent_mock[0].data['short_description'] == 'VirusTotal Malware analysis.'
     assert agent_mock[0].data['privacy_issue']
     assert agent_mock[0].data['security_issue']
     assert agent_mock[0].data['references'] == [{'title': 'Virustotal', 'url': 'https://www.virustotal.com/'}]

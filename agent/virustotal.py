@@ -1,9 +1,9 @@
 """Module responsible for interacting with Virus Total public API."""
-from typing import Dict, Optional
 import hashlib
+from typing import Optional, Dict
 
 import virus_total_apis
-from ostorlab.agent import message as agent_message
+from ostorlab.agent.message import message as msg
 
 
 class Error(Exception):
@@ -14,7 +14,7 @@ class VirusTotalApiError(Error):
     """VirtualTotalApiError."""
 
 
-def scan_file_from_message(message: agent_message.Message, api_key: str) -> Dict:
+def scan_file_from_message(message: msg.Message, api_key: str) -> Dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
         message: Message containing the file to scan.

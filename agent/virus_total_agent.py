@@ -2,13 +2,13 @@
 import logging
 
 from ostorlab.agent import agent, definitions as agent_definitions
-from ostorlab.agent.mixins import agent_report_vulnerability_mixin
-from ostorlab.agent import message as msg
 from ostorlab.agent.kb import kb
+from ostorlab.agent.message import message as msg
+from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.runtimes import definitions as runtime_definitions
 
-from agent import virustotal
 from agent import process_scans
+from agent import virustotal
 
 logger = logging.getLogger(__name__)
 
