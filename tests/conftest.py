@@ -1,4 +1,4 @@
-"""Pytest fixtures for the virustotal agent."""
+"""Pytest fixtures for the virustotal agent. """
 import pytest
 import pathlib
 
