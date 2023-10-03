@@ -1,6 +1,6 @@
 """Module responsible for interacting with Virus Total public API."""
 import hashlib
-from typing import Optional, Dict
+from typing import Any
 
 import virus_total_apis
 from ostorlab.agent.message import message as msg
@@ -16,7 +16,7 @@ class VirusTotalApiError(Error):
     """VirtualTotalApiError."""
 
 
-def scan_file_from_message(message: msg.Message, api_key: str) -> Dict:
+def scan_file_from_message(message: msg.Message, api_key: str) -> dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
         message: Message containing the file to scan.
@@ -32,21 +32,20 @@ def scan_file_from_message(message: msg.Message, api_key: str) -> Dict:
     return response
 
 
-def scan_url_from_message(message: msg.Message, api_key: str) -> Dict:
+def scan_url_from_message(target: str, api_key: str) -> dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
-        message: Message containing the file to scan.
+        target: url to scan.
         api_key : Key for the virustotal api.
     Returns:
         response: The response of the Virus Total public API.
     """
-    url = message.data["url"]
     virustotal_client = virus_total_apis.PublicApi(api_key)
-    response = virustotal_client.get_url_report(url, timeout=TIMEOUT_REQUEST)
+    response = virustotal_client.get_url_report(target, timeout=TIMEOUT_REQUEST)
     return response
 
 
-def get_scans(response: Dict) -> Optional[Dict]:
+def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
     """Method that returns the scans from the Virus Total public API response.
 
     Args:

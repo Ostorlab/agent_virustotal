@@ -1,11 +1,11 @@
 """Module responsible for markdown formatting."""
-from typing import Dict, List
+from typing import Any
 import io
 
 from pytablewriter import MarkdownTableWriter
 
 
-def prepare_data_for_markdown_formatting(scans: Dict) -> List[List[str]]:
+def prepare_data_for_markdown_formatting(scans: dict[str, Any]) -> list[list[str]]:
     """Method responsible for formatting the data into the correct form for the MarkdownTableWriter.
 
     Args:
@@ -22,7 +22,7 @@ def prepare_data_for_markdown_formatting(scans: Dict) -> List[List[str]]:
     return data
 
 
-def table_markdown(data: List[List[str]]) -> str:
+def table_markdown(data: list[list[str]]) -> str:
     """Method responsible for generating a markdown table from a dictionary.
 
     Args:

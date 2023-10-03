@@ -1,5 +1,7 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
 import logging
+import ipaddress
+from typing import Any
 
 from ostorlab.agent import agent, definitions as agent_definitions
 from ostorlab.agent.kb import kb
@@ -44,11 +46,14 @@ class VirusTotalAgent(
         """
         if message.data.get("content") is not None:
             response = virustotal.scan_file_from_message(message, self.api_key)
-        elif message.data.get("url") is not None:
-            response = virustotal.scan_url_from_message(message, self.api_key)
+            self._process_response(response, message.data.get("path"))
         else:
-            return None
+            targets = self._prepare_targets(message)
+            for target in targets:
+                response = virustotal.scan_url_from_message(target, self.api_key)
+                self._process_response(response, target)
 
+    def _process_response(self, response: dict[str, Any], target: str | None):
         try:
             scans = virustotal.get_scans(response)
         except virustotal.VirusTotalApiError:
@@ -57,7 +62,7 @@ class VirusTotalAgent(
 
         try:
             if scans is not None:
-                technical_detail = process_scans.get_technical_details(scans)
+                technical_detail = process_scans.get_technical_details(scans, target)
                 risk_rating = process_scans.get_risk_rating(scans)
                 self.report_vulnerability(
                     entry=kb.KB.VIRUSTOTAL_SCAN,
@@ -67,6 +72,50 @@ class VirusTotalAgent(
         except NameError:
             logger.error("The scans list is empty.")
             raise
+
+    def _get_schema(self, message: msg.Message) -> str:
+        """Returns the schema to be used for the target."""
+        if message.data.get("schema") is not None:
+            return str(message.data["schema"])
+        elif message.data.get("protocol") is not None:
+            return str(message.data["protocol"])
+        elif self.args.get("https") is True:
+            return "https"
+        else:
+            return "http"
+
+    def _prepare_targets(self, message: msg.Message) -> list[str]:
+        """Prepare targets based on type, if a domain name is provided, port and protocol are collected
+        from the config."""
+        if message.data.get("host") is not None:
+            host = str(message.data.get("host"))
+            if message.data.get("mask") is None:
+                ip_network = ipaddress.ip_network(host)
+            else:
+                mask = message.data.get("mask")
+                ip_network = ipaddress.ip_network(f"{host}/{mask}", strict=False)
+            return [str(h) for h in ip_network.hosts()]
+
+        elif (domain_name := message.data.get("name")) is not None:
+            schema = self._get_schema(message)
+            port = self.args.get("port")
+            if schema == "https" and port not in [443, None]:
+                url = f"https://{domain_name}:{port}"
+            elif schema == "https":
+                url = f"https://{domain_name}"
+            elif port == 80:
+                url = f"http://{domain_name}"
+            elif port is None:
+                url = f"{schema}://{domain_name}"
+            else:
+                url = f"{schema}://{domain_name}:{port}"
+
+            return [url]
+
+        elif (url_temp := message.data.get("url")) is not None:
+            return [url_temp]
+        else:
+            return []
 
 
 if __name__ == "__main__":

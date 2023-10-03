@@ -1,19 +1,56 @@
 """Unittests for virustotal agent."""
+from typing import Any
+
 import pytest
+from pytest_mock import plugin
+from ostorlab.agent.message import message as msg
 
 from agent import virustotal
+from agent import virus_total_agent
+
+
+def virustotal_valid_response(url: str, timeout: int) -> dict[str, Any]:
+    """Method for mocking the Virus Total public API valid response."""
+    del url, timeout
+    response = {
+        "results": {
+            "scans": {
+                "Bkav": {
+                    "detected": False,
+                    "version": "1.3.0.9899",
+                    "result": None,
+                    "update": "20220107",
+                },
+                "Elastic": {
+                    "detected": True,
+                    "version": "4.0.32",
+                    "result": "eicar",
+                    "update": "20211223",
+                },
+            },
+            "scan_id": "ID42",
+            "sha1": "some_sha1",
+            "resource": "some_ressource_id",
+            "response_code": 1,
+        },
+        "response_code": 200,
+    }
+    return response
 
 
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
-    mocker, agent_mock, virustotal_agent, message
-):
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
     """Unittest for the lifecyle of the virustotal agent :
     Sends a dummy malicious file through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
 
-    def virustotal_valid_response(message):
+    def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
         """Method for mocking the Virus Total public API valid response."""
         del message
         response = {
@@ -68,13 +105,15 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalA
 
 
 def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
-    mocker, virustotal_agent, message
-):
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
     """Unittest for the lifecyle of the virustotal agent :
     Case where the Virus Total public API response is invalid.
     """
 
-    def virustotal_invalid_response(message):
+    def virustotal_invalid_response(message: msg.Message) -> dict[str, Any]:
         """Method for mocking the virustotal public api invalid response."""
         del message
         return {
@@ -93,49 +132,90 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalA
 
 
 def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
-    mocker, agent_mock, virustotal_agent, url_message
-):
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    url_message: msg.Message,
+) -> None:
     """Unittest for the lifecyle of the virustotal agent :
     Sends a dummy malicious url through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
-
-    def virustotal_valid_response(url: str, timeout: int):
-        """Method for mocking the Virus Total public API valid response."""
-        del url, timeout
-        response = {
-            "results": {
-                "scans": {
-                    "Bkav": {
-                        "detected": False,
-                        "version": "1.3.0.9899",
-                        "result": None,
-                        "update": "20220107",
-                    },
-                    "Elastic": {
-                        "detected": True,
-                        "version": "4.0.32",
-                        "result": "eicar",
-                        "update": "20211223",
-                    },
-                },
-                "scan_id": "ID42",
-                "sha1": "some_sha1",
-                "resource": "some_ressource_id",
-                "response_code": 1,
-            },
-            "response_code": 200,
-        }
-        return response
-
     mocker.patch(
         "virus_total_apis.PublicApi.get_url_report",
         side_effect=virustotal_valid_response,
     )
 
     virustotal_agent.process(url_message)
+
     assert len(agent_mock) == 1
+    assert agent_mock[0].selector == "v3.report.vulnerability"
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert (
+        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+    )
+    assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
+    assert agent_mock[0].data["privacy_issue"]
+    assert agent_mock[0].data["security_issue"]
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+
+
+def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    create_domain_message: msg.Message,
+) -> None:
+    """Unittest for the lifecyle of the virustotal agent :
+    Sends a dummy malicious domain through the Virus Total public API,
+    receives a valid response, assign a risk rating, creates a technical detail
+    and finally emits a message of type v3.report.vulnerability with the details above.
+    """
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_url_report",
+        side_effect=virustotal_valid_response,
+    )
+
+    virustotal_agent.process(create_domain_message)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].selector == "v3.report.vulnerability"
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert (
+        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+    )
+    assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
+    assert agent_mock[0].data["privacy_issue"]
+    assert agent_mock[0].data["security_issue"]
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+
+
+def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    create_network_range_message: msg.Message,
+) -> None:
+    """Unittest for the lifecyle of the virustotal agent :
+    Sends a dummy malicious IP range through the Virus Total public API,
+    receives a valid response, assign a risk rating, creates a technical detail
+    and finally emits a message of type v3.report.vulnerability with the details above.
+    """
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_url_report",
+        side_effect=virustotal_valid_response,
+    )
+
+    virustotal_agent.process(create_network_range_message)
+
+    assert len(agent_mock) == 14
     assert agent_mock[0].selector == "v3.report.vulnerability"
     assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
