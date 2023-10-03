@@ -56,13 +56,14 @@ class VirusTotalAgent(
             raise
 
         try:
-            technical_detail = process_scans.get_technical_details(scans)
-            risk_rating = process_scans.get_risk_rating(scans)
-            self.report_vulnerability(
-                entry=kb.KB.VIRUSTOTAL_SCAN,
-                technical_detail=technical_detail,
-                risk_rating=risk_rating,
-            )
+            if scans is not None:
+                technical_detail = process_scans.get_technical_details(scans)
+                risk_rating = process_scans.get_risk_rating(scans)
+                self.report_vulnerability(
+                    entry=kb.KB.VIRUSTOTAL_SCAN,
+                    technical_detail=technical_detail,
+                    risk_rating=risk_rating,
+                )
         except NameError:
             logger.error("The scans list is empty.")
             raise

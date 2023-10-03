@@ -4,7 +4,7 @@ import pytest
 from agent import virustotal
 
 
-def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
     mocker, agent_mock, virustotal_agent, message
 ):
     """Unittest for the lifecyle of the virustotal agent :
@@ -67,7 +67,7 @@ def testVirusTotalAgent_when_virusTotalApiReturnsValidResponse_noRaiseVirusTotal
     ]
 
 
-def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
     mocker, virustotal_agent, message
 ):
     """Unittest for the lifecyle of the virustotal agent :
@@ -92,16 +92,16 @@ def testVirusTotalAgent_when_virusTotalApiReturnsInvalidResponse_raiseVirusTotal
         virustotal_agent.process(message)
 
 
-def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
+def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     mocker, agent_mock, virustotal_agent, url_message
 ):
     """Unittest for the lifecyle of the virustotal agent :
-    Sends a dummy malicious file through the Virus Total public API,
+    Sends a dummy malicious url through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
 
-    def virustotal_valid_response(url, timeout):
+    def virustotal_valid_response(url: str, timeout: int):
         """Method for mocking the Virus Total public API valid response."""
         del url, timeout
         response = {
@@ -134,12 +134,7 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse_noRai
         side_effect=virustotal_valid_response,
     )
 
-    try:
-        virustotal_agent.process(url_message)
-    except virustotal.VirusTotalApiError:
-        pytest.fail(
-            "Unexpected VirusTotalApiError because response is returned with status 200."
-        )
+    virustotal_agent.process(url_message)
     assert len(agent_mock) == 1
     assert agent_mock[0].selector == "v3.report.vulnerability"
     assert agent_mock[0].data["risk_rating"] == "HIGH"
