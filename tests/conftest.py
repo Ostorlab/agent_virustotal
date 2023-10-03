@@ -22,6 +22,16 @@ def create_scan_message():
     return msg.Message.from_data(selector, data=msg_data)
 
 
+@pytest.fixture(name="url_message")
+def create_url_scan_message():
+    """Creates a dummy message of type v3.asset.file to be used by the agent for testing purposes.
+    The files used is the EICAR Anti-Virus Test File.
+    """
+    selector = "v3.asset.link"
+    msg_data = {"url": "https://virus.com", "method": "GET"}
+    return msg.Message.from_data(selector, data=msg_data)
+
+
 @pytest.fixture(name="virustotal_agent")
 def create_virustotal_agent():
     """Instantiate a virustotal agent."""

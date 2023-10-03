@@ -42,7 +42,12 @@ class VirusTotalAgent(
             VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
-        response = virustotal.scan_file_from_message(message, self.api_key)
+        if message.data.get("content") is not None:
+            response = virustotal.scan_file_from_message(message, self.api_key)
+        elif message.data.get("url") is not None:
+            response = virustotal.scan_url_from_message(message, self.api_key)
+        else:
+            return None
 
         try:
             scans = virustotal.get_scans(response)

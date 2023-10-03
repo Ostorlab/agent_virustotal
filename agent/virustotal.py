@@ -5,6 +5,8 @@ from typing import Optional, Dict
 import virus_total_apis
 from ostorlab.agent.message import message as msg
 
+TIMEOUT_REQUEST = 30
+
 
 class Error(Exception):
     """Custom Error."""
@@ -27,6 +29,20 @@ def scan_file_from_message(message: msg.Message, api_key: str) -> Dict:
     hash_hexa = file_md5_hash.hexdigest()
     virustotal_client = virus_total_apis.PublicApi(api_key)
     response = virustotal_client.get_file_report(hash_hexa)
+    return response
+
+
+def scan_url_from_message(message: msg.Message, api_key: str) -> Dict:
+    """Method responsible for scanning a file through the Virus Total public API.
+    Args:
+        message: Message containing the file to scan.
+        api_key : Key for the virustotal api.
+    Returns:
+        response: The response of the Virus Total public API.
+    """
+    url = message.data["url"]
+    virustotal_client = virus_total_apis.PublicApi(api_key)
+    response = virustotal_client.get_url_report(url, timeout=TIMEOUT_REQUEST)
     return response
 
 

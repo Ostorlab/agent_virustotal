@@ -70,6 +70,7 @@ license: Apache-2.0
 source: https://github.com/Ostorlab/agent_virus_total
 in_selectors:
   - v3.asset.file
+  - v3.asset.link
 out_selectors:
   - v3.report.vulnerability 
 args:
