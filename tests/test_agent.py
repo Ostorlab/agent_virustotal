@@ -135,6 +135,7 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     )
 
     virustotal_agent.process(url_message)
+
     assert len(agent_mock) == 1
     assert agent_mock[0].selector == "v3.report.vulnerability"
     assert agent_mock[0].data["risk_rating"] == "HIGH"
