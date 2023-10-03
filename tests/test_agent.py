@@ -9,7 +9,7 @@ from agent import virustotal
 from agent import virus_total_agent
 
 
-def virustotal_valid_response(url: str, timeout: int) -> dict[str, Any]:
+def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     """Method for mocking the Virus Total public API valid response."""
     del url, timeout
     response = {
@@ -144,7 +144,7 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     """
     mocker.patch(
         "virus_total_apis.PublicApi.get_url_report",
-        side_effect=virustotal_valid_response,
+        side_effect=virustotal_url_valid_response,
     )
 
     virustotal_agent.process(url_message)
@@ -177,7 +177,7 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
     """
     mocker.patch(
         "virus_total_apis.PublicApi.get_url_report",
-        side_effect=virustotal_valid_response,
+        side_effect=virustotal_url_valid_response,
     )
 
     virustotal_agent.process(create_domain_message)
@@ -210,7 +210,7 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     """
     mocker.patch(
         "virus_total_apis.PublicApi.get_url_report",
-        side_effect=virustotal_valid_response,
+        side_effect=virustotal_url_valid_response,
     )
 
     virustotal_agent.process(create_network_range_message)
