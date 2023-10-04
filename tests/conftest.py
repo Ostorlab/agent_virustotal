@@ -10,7 +10,7 @@ from agent import virus_total_agent
 
 
 @pytest.fixture(name="message")
-def create_scan_message():
+def create_scan_message() -> msg.Message:
     """Creates a dummy message of type v3.asset.file to be used by the agent for testing purposes.
     The files used is the EICAR Anti-Virus Test File.
     """
@@ -22,8 +22,34 @@ def create_scan_message():
     return msg.Message.from_data(selector, data=msg_data)
 
 
+@pytest.fixture(name="url_message")
+def create_url_scan_message() -> msg.Message:
+    """Creates a dummy message of type v3.asset.link to be used by the agent for testing purposes.
+    The files used is the EICAR Anti-Virus Test File.
+    """
+    selector = "v3.asset.link"
+    msg_data = {"url": "https://virus.com", "method": "GET"}
+    return msg.Message.from_data(selector, data=msg_data)
+
+
+@pytest.fixture
+def create_network_range_message() -> msg.Message:
+    """Creates a dummy message of type v3.asset.ip.v4 to be used by the agent for testing purposes."""
+    selector = "v3.asset.ip.v4"
+    msg_data = {"host": "209.235.136.112", "mask": "28", "version": 4}
+    return msg.Message.from_data(selector, data=msg_data)
+
+
+@pytest.fixture
+def create_domain_message() -> msg.Message:
+    """Creates a dummy message of type v3.asset.domain_name to be used by the agent for testing purposes."""
+    selector = "v3.asset.domain_name"
+    msg_data = {"name": "apple.com"}
+    return msg.Message.from_data(selector, data=msg_data)
+
+
 @pytest.fixture(name="virustotal_agent")
-def create_virustotal_agent():
+def create_virustotal_agent() -> virus_total_agent.VirusTotalAgent:
     """Instantiate a virustotal agent."""
     definition = agent_definitions.AgentDefinition(
         name="agent_virustotal",
