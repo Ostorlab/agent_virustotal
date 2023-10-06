@@ -22,9 +22,9 @@ class VirusTotalAgent(
     """Agent responsible for scanning a file through the Virus Total DB."""
 
     def __init__(
-            self,
-            agent_definition: agent_definitions.AgentDefinition,
-            agent_settings: runtime_definitions.AgentSettings,
+        self,
+        agent_definition: agent_definitions.AgentDefinition,
+        agent_settings: runtime_definitions.AgentSettings,
     ) -> None:
         """Init method.
         Args:
@@ -48,7 +48,9 @@ class VirusTotalAgent(
         """
         file_content = file.get_file_content(message)
         if file_content is not None:
-            response = virustotal.scan_file_from_message(file_content=file_content, api_key=self.api_key)
+            response = virustotal.scan_file_from_message(
+                file_content=file_content, api_key=self.api_key
+            )
             self._process_response(response, message.data.get("path"))
         else:
             targets = self._prepare_targets(message)
