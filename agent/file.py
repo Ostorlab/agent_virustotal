@@ -1,5 +1,4 @@
 """Collection of functions to handle files."""
-import magic
 import requests
 import tenacity
 from ostorlab.agent.message import message as m
@@ -46,16 +45,3 @@ def get_file_content(message: m.Message) -> bytes | None:
     content_url: str | None = message.data.get("content_url")
     if content_url is not None:
         return _download_file(content_url)
-
-
-def get_mime_type(file_bytes):
-    """Get the mime type of file.
-
-    Args:
-        file_bytes: The content of the file.
-
-    Returns: The mime type of the file.
-    """
-    mime = magic.Magic()
-    mime_type = mime.from_buffer(file_bytes)
-    return mime_type
