@@ -48,9 +48,8 @@ class VirusTotalAgent(
         """
         file_content = file.get_file_content(message)
         if file_content is not None:
-            if len(self.whitelist_types) == 0 or file.get_mime_type(file_content) not in self.whitelist_types:
+            if len(self.whitelist_types) != 0 and file.get_mime_type(file_content) not in self.whitelist_types:
                 return None
-
             response = virustotal.scan_file_from_message(file_content=file_content, api_key=self.api_key)
             self._process_response(response, message.data.get("path"))
         else:
