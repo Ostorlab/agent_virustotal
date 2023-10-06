@@ -33,7 +33,6 @@ class VirusTotalAgent(
         """
         super().__init__(agent_definition, agent_settings)
         self.api_key = self.args.get("api_key")
-        self.whitelist_types = self.args.get("whitelist_types", [])
 
     def process(self, message: msg.Message) -> None:
         """Process message of type v3.asset.file. Scan the file content through the Virus Total public API, assign a
