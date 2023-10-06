@@ -2,3 +2,4 @@ ostorlab[agent]
 virustotal-api
 pytablewriter
 rich
+python-magic

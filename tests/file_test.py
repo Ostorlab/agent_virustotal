@@ -40,3 +40,11 @@ def testGetFileContent_whenNoContentIsAvailable_shouldReturnNone() -> None:
     content = file.get_file_content(message)
 
     assert content is None
+
+
+def testGetMimeType_whenContentIsNotNone_shouldReturnMimeType() -> None:
+    """Test that the mime type is returned when the content is not empty."""
+
+    mime_type = file.get_mime_type(b"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*")
+
+    assert mime_type == "EICAR virus test files"
