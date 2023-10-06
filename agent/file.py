@@ -31,7 +31,7 @@ def _download_file(file_url: str) -> bytes | None:
 
 
 def get_file_content(message: m.Message) -> bytes | None:
-    """Get the file info from a message.
+    """Get the file content from a message.
 
     Args:
         message : The message containing the file info.
@@ -45,6 +45,4 @@ def get_file_content(message: m.Message) -> bytes | None:
     content_url: str | None = message.data.get("content_url")
     if content_url is not None:
         file_content: bytes | None = _download_file(content_url)
-        if file_content is not None:
-            return file_content
-    return None
+        return file_content
