@@ -22,9 +22,9 @@ class VirusTotalAgent(
     """Agent responsible for scanning a file through the Virus Total DB."""
 
     def __init__(
-            self,
-            agent_definition: agent_definitions.AgentDefinition,
-            agent_settings: runtime_definitions.AgentSettings,
+        self,
+        agent_definition: agent_definitions.AgentDefinition,
+        agent_settings: runtime_definitions.AgentSettings,
     ) -> None:
         """Init method.
         Args:
