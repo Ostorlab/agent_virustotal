@@ -3,7 +3,6 @@ import hashlib
 from typing import Any
 
 import virus_total_apis
-from ostorlab.agent.message import message as msg
 
 TIMEOUT_REQUEST = 30
 
@@ -16,16 +15,15 @@ class VirusTotalApiError(Error):
     """VirtualTotalApiError."""
 
 
-def scan_file_from_message(message: msg.Message, api_key: str) -> dict:
+def scan_file_from_message(file_content: bytes, api_key: str) -> dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
-        message: Message containing the file to scan.
+        file_content: Message containing the file to scan.
         api_key : Key for the virustotal api.
     Returns:
         response: The response of the Virus Total public API.
     """
-    file = message.data["content"]
-    file_md5_hash = hashlib.md5(file)
+    file_md5_hash = hashlib.md5(file_content)
     hash_hexa = file_md5_hash.hexdigest()
     virustotal_client = virus_total_apis.PublicApi(api_key)
     response = virustotal_client.get_file_report(hash_hexa)

@@ -1,6 +1,6 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
-import logging
 import ipaddress
+import logging
 from typing import Any
 
 from ostorlab.agent import agent, definitions as agent_definitions
@@ -9,6 +9,7 @@ from ostorlab.agent.message import message as msg
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.runtimes import definitions as runtime_definitions
 
+from agent import file
 from agent import process_scans
 from agent import virustotal
 
@@ -44,8 +45,11 @@ class VirusTotalAgent(
             VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
-        if message.data.get("content") is not None:
-            response = virustotal.scan_file_from_message(message, self.api_key)
+        file_content = file.get_file_content(message)
+        if file_content is not None:
+            response = virustotal.scan_file_from_message(
+                file_content=file_content, api_key=self.api_key
+            )
             self._process_response(response, message.data.get("path"))
         else:
             targets = self._prepare_targets(message)
