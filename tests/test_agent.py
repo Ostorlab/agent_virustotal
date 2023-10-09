@@ -228,3 +228,29 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+
+
+def testVirusTotalAgent_whenVirusTotalReachApiRatesLimit_raiseVirusTotalApiError(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
+    """Unittest for the lifecyle of the virustotal agent :
+    Case where the Virus Total public API reached the rate limit.
+    """
+
+    def virustotal_invalid_response(message: msg.Message) -> dict[str, Any]:
+        """Method for mocking the virustotal public api invalid response."""
+        del message
+        return {
+            "error": "You exceeded the public API request rate limit (4 requests of any nature per minute)",
+            "response_code": 204,
+        }
+
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_invalid_response,
+    )
+
+    with pytest.raises(virustotal.VirusTotalApiError):
+        virustotal_agent.process(message)
