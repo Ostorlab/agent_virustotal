@@ -1,6 +1,6 @@
 FROM python:3.10-alpine as base
 FROM base as builder
-RUN apk add build-base
+RUN apk add build-base libmagic
 RUN apk update
 RUN mkdir /install
 WORKDIR /install
