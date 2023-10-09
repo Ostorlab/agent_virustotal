@@ -230,7 +230,7 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     ]
 
 
-def testVirusTotalAgent_whenVirusTotalReachApiRatesLimit_raiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiError(
     mocker: plugin.MockerFixture,
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
