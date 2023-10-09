@@ -3,6 +3,7 @@ import ipaddress
 import logging
 from typing import Any
 
+import magic
 from ostorlab.agent import agent, definitions as agent_definitions
 from ostorlab.agent.kb import kb
 from ostorlab.agent.message import message as msg
@@ -33,6 +34,7 @@ class VirusTotalAgent(
         """
         super().__init__(agent_definition, agent_settings)
         self.api_key = self.args.get("api_key")
+        self.whitelist_types = self.args.get("whitelist_types", [])
 
     def process(self, message: msg.Message) -> None:
         """Process message of type v3.asset.file. Scan the file content through the Virus Total public API, assign a
@@ -47,6 +49,12 @@ class VirusTotalAgent(
         """
         file_content = file.get_file_content(message)
         if file_content is not None:
+            if (
+                len(self.whitelist_types) != 0
+                and magic.from_buffer(file_content, mime=True)
+                not in self.whitelist_types
+            ):
+                return None
             response = virustotal.scan_file_from_message(
                 file_content=file_content, api_key=self.api_key
             )

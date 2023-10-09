@@ -77,3 +77,40 @@ def create_virustotal_agent() -> virus_total_agent.VirusTotalAgent:
     )
 
     return agent
+
+
+@pytest.fixture
+def virustotal_agent_with_whitelist() -> virus_total_agent.VirusTotalAgent:
+    """Instantiate a virustotal agent."""
+    definition = agent_definitions.AgentDefinition(
+        name="agent_virustotal",
+        in_selectors=["v3.asset.file"],
+        out_selectors=["v3.report.vulnerability"],
+        args=[
+            {
+                "name": "api_key",
+                "type": "string",
+                "value": "some_api_key",
+                "description": "Api key for the virus total API.",
+            },
+            {
+                "name": "whitelist_types",
+                "type": "list",
+                "value": ["application/zip"],
+                "description": "List of mime types to whitelist.",
+            },
+        ],
+    )
+
+    settings = runtime_definitions.AgentSettings(
+        key="agent_virustotal_key",
+        bus_url="NA",
+        bus_exchange_topic="NA",
+    )
+
+    agent = virus_total_agent.VirusTotalAgent(
+        definition,
+        settings,
+    )
+
+    return agent
