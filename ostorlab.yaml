@@ -1,7 +1,7 @@
 kind: Agent
 name: virustotal
-version: 0.1.6
-image: images/logo.png
+version: 0.1.7
+image: images/logo.png 
 description: |
   This repository is an implementation of the VirusTotal agent.
 
@@ -84,9 +84,6 @@ args:
   - name: "whitelist_types"
     type: "array"
     description: "List of mimetypes types to whitelist for scanning."
-    value:
-      - application/zip
-      - application/x-dosexec
   - name: "enable_whitelist"
     type: "array"
     description: "List of mimetypes types to whitelist for scanning."
