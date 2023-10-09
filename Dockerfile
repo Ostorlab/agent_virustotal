@@ -7,7 +7,7 @@ WORKDIR /install
 COPY requirement.txt /requirement.txt
 RUN pip install --prefix=/install -r /requirement.txt
 FROM base
-RUN apk libmagic
+RUN apk add libmagic
 COPY --from=builder /install /usr/local
 RUN mkdir -p /app/agent
 ENV PYTHONPATH=/app
