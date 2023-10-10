@@ -104,7 +104,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalA
     ]
 
 
-def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShoulNotCrash(
     mocker: plugin.MockerFixture,
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
@@ -126,9 +126,13 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalA
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_invalid_response,
     )
+    get_scans_mocker = mocker.patch(
+        "agent.virustotal.get_scans", side_effect=virustotal.VirusTotalApiError
+    )
 
-    with pytest.raises(virustotal.VirusTotalApiError):
-        virustotal_agent.process(message)
+    virustotal_agent.process(message)
+
+    assert get_scans_mocker.call_count == 1
 
 
 def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
