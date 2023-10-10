@@ -289,7 +289,7 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiErro
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unit test for the lifecyle of the virustotal agent :
     Case where the Virus Total public API reached the rate limit.
     """
 
