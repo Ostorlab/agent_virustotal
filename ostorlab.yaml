@@ -75,11 +75,17 @@ in_selectors:
   - v3.asset.ip.v6
   - v3.asset.domain_name
 out_selectors:
-  - v3.report.vulnerability 
+  - v3.report.vulnerability
 args:
   - name: "api_key"
     type: "string"
     description: "Virus Total public API Key."
     value: "__ADD_API_KEY_HERE__"
-docker_file_path : Dockerfile
-docker_build_root : .
+  - name: "whitelist_types"
+    type: "array"
+    description: "List of mimetypes types to whitelist for scanning."
+  - name: "enable_whitelist"
+    type: "array"
+    description: "List of mimetypes types to whitelist for scanning."
+docker_file_path: Dockerfile
+docker_build_root: .

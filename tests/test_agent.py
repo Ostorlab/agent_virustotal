@@ -1,12 +1,15 @@
 """Unittests for virustotal agent."""
+import pathlib
+import re
 from typing import Any
+import requests_mock as rq_mock
 
 import pytest
-from pytest_mock import plugin
 from ostorlab.agent.message import message as msg
+from pytest_mock import plugin
 
-from agent import virustotal
 from agent import virus_total_agent
+from agent import virustotal
 
 
 def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
@@ -232,6 +235,54 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+
+
+def testVirusTotalAgent_whenWhitelistTypesIsSet_agentShouldIgnoreNonWhitelisted(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent_with_whitelist: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+    requests_mock: rq_mock.mocker.Mocker,
+) -> None:
+    """Test when file is not whitelisted, agent should not call the Virus Total public API."""
+    dummy_zip = pathlib.Path(__file__).parent / "files/dummy1.txt"
+    zip_message = msg.Message.from_data(
+        "v3.asset.file", data={"content": dummy_zip.read_bytes()}
+    )
+    virustotal_call = requests_mock.get(
+        re.compile("https://www.virustotal.com/vtapi/v2/file/*"),
+        json=virustotal_url_valid_response,
+    )
+
+    virustotal_agent_with_whitelist.process(zip_message)
+
+    assert virustotal_call.called is False
+
+
+def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent_with_whitelist: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+    requests_mock: rq_mock.mocker.Mocker,
+) -> None:
+    """Test when file whitelisted, agent should call the Virus Total public API."""
+    dummy_zip = pathlib.Path(__file__).parent / "files/dummy.zip"
+    zip_message = msg.Message.from_data(
+        "v3.asset.file", data={"content": dummy_zip.read_bytes()}
+    )
+    virustotal_call = requests_mock.get(
+        re.compile("https://www.virustotal.com/vtapi/v2/file/*"),
+        json=virustotal_url_valid_response,
+    )
+
+    virustotal_agent_with_whitelist.process(zip_message)
+
+    assert virustotal_call.called is True
+    assert (
+        virustotal_call.last_request.query
+        == "apikey=some_api_key&resource=e29efc13355681a4aa23f0623c2316b9"
+    )
 
 
 def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiError(
