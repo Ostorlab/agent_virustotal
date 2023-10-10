@@ -1,10 +1,13 @@
 """Module responsible for interacting with Virus Total public API."""
 import hashlib
 from typing import Any
+import logging
 
 import virus_total_apis
 
 TIMEOUT_REQUEST = 30
+
+logger = logging.getLogger(__name__)
 
 
 class Error(Exception):
@@ -55,7 +58,10 @@ def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
     Raises:
         VirusTotalApiError: In case the API request encountered problems.
     """
-    if response["response_code"] == 0 or "results" not in response:
+    if response.get("response_code") == 204 and response.get("error") is not None:
+        logger.error("Exceeded the virustotal API rate limit.")
+        raise VirusTotalApiError()
+    elif response.get("response_code") == 0 or "results" not in response:
         raise VirusTotalApiError()
     elif response["results"]["response_code"] == 1:
         return response["results"]["scans"]

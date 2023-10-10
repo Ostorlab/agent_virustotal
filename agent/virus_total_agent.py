@@ -65,12 +65,12 @@ class VirusTotalAgent(
                 response = virustotal.scan_url_from_message(target, self.api_key)
                 self._process_response(response, target)
 
-    def _process_response(self, response: dict[str, Any], target: str | None):
+    def _process_response(self, response: dict[str, Any], target: str | None) -> None:
         try:
             scans = virustotal.get_scans(response)
         except virustotal.VirusTotalApiError:
             logger.error("Virus Total API encountered some problems. Please try again.")
-            raise
+            return None
 
         try:
             if scans is not None:
@@ -83,7 +83,6 @@ class VirusTotalAgent(
                 )
         except NameError:
             logger.error("The scans list is empty.")
-            raise
 
     def _get_schema(self, message: msg.Message) -> str:
         """Returns the schema to be used for the target."""

@@ -107,7 +107,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalA
     ]
 
 
-def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCrash(
     mocker: plugin.MockerFixture,
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
@@ -129,9 +129,13 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_raiseVirusTotalA
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_invalid_response,
     )
+    get_scans_mocker = mocker.patch(
+        "agent.virustotal.get_scans", side_effect=virustotal.VirusTotalApiError
+    )
 
-    with pytest.raises(virustotal.VirusTotalApiError):
-        virustotal_agent.process(message)
+    virustotal_agent.process(message)
+
+    assert get_scans_mocker.call_count == 1
 
 
 def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
@@ -279,3 +283,20 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
         virustotal_call.last_request.query
         == "apikey=some_api_key&resource=e29efc13355681a4aa23f0623c2316b9"
     )
+
+
+def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiError(
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
+    """Unit test for the lifecyle of the virustotal agent :
+    Case where the Virus Total public API reached the rate limit.
+    """
+
+    response = {
+        "error": "You exceeded the public API request rate limit (4 requests of any nature per minute)",
+        "response_code": 204,
+    }
+
+    with pytest.raises(virustotal.VirusTotalApiError):
+        virustotal.get_scans(response)
