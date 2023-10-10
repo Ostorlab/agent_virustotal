@@ -107,7 +107,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalA
     ]
 
 
-def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShoulNotCrash(
+def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCrash(
     mocker: plugin.MockerFixture,
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
