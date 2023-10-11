@@ -300,3 +300,20 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiErro
 
     with pytest.raises(virustotal.VirusTotalApiError):
         virustotal.get_scans(response)
+
+
+def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
+    """Unit test for the lifecyle of the virustotal agent:
+    Case when the whitelist_types arg not provided agent shouldn't crash
+    """
+    get_file_content_mock = mocker.patch(
+        "agent.file.get_file_content", return_value=b""
+    )
+
+    virustotal_agent.process(message)
+
+    assert get_file_content_mock.call_count == 1
