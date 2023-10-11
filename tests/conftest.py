@@ -61,7 +61,12 @@ def create_virustotal_agent() -> virus_total_agent.VirusTotalAgent:
                 "type": "string",
                 "value": "some_api_key",
                 "description": "Api key for the virus total API.",
-            }
+            },
+            {
+                "name": "whitelist_types",
+                "type": "array",
+                "description": "List of mimetypes types to whitelist for scanning.",
+            },
         ],
     )
 

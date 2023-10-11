@@ -285,6 +285,21 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
     )
 
 
+def testVirusTotalAgent_whenWhiteListTypes_shouldNotCrash(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
+    """Unittest for the lifecyle of the virustotal agent:
+    Case when the whitelist_types arg not provided agent shouldn't crash
+    """
+    get_file_content_mock = mocker.patch(
+        "agent.file.get_file_content", return_value=b""
+    )
+    virustotal_agent.process(message)
+    assert get_file_content_mock.call_count == 1
+
+
 def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiError(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
