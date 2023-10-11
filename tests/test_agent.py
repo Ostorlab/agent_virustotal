@@ -302,12 +302,12 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiErro
         virustotal.get_scans(response)
 
 
-def testVirusTotalAgent_whenWhiteListTypes_shouldNotCrash(
+def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
     mocker: plugin.MockerFixture,
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent:
+    """Unit test for the lifecyle of the virustotal agent:
     Case when the whitelist_types arg not provided agent shouldn't crash
     """
     get_file_content_mock = mocker.patch(
