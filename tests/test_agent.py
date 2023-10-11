@@ -314,4 +314,5 @@ def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
         "agent.file.get_file_content", return_value=b""
     )
     virustotal_agent.process(message)
+
     assert get_file_content_mock.call_count == 1
