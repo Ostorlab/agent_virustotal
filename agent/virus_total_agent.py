@@ -34,7 +34,7 @@ class VirusTotalAgent(
         """
         super().__init__(agent_definition, agent_settings)
         self.api_key = self.args.get("api_key")
-        self.whitelist_types = self.args.get("whitelist_types", [])
+        self.whitelist_types = self.args.get("whitelist_types") or []
 
     def process(self, message: msg.Message) -> None:
         """Process message of type v3.asset.file. Scan the file content through the Virus Total public API, assign a
@@ -50,8 +50,7 @@ class VirusTotalAgent(
         file_content = file.get_file_content(message)
         if file_content is not None:
             if (
-                self.whitelist_types is not None
-                and len(self.whitelist_types) != 0
+                len(self.whitelist_types) != 0
                 and magic.from_buffer(file_content, mime=True)
                 not in self.whitelist_types
             ):
