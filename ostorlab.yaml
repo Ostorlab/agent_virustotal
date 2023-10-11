@@ -1,6 +1,6 @@
 kind: Agent
 name: virustotal
-version: 0.1.8
+version: 0.1.9
 image: images/logo.png 
 description: |
   This repository is an implementation of the VirusTotal agent.
