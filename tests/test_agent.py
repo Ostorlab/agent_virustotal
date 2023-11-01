@@ -41,6 +41,13 @@ def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     return response
 
 
+def virustotal_url_invalid_response(url: str, timeout: int) -> dict[str, Any]:
+    """Method for mocking the Virus Total public API invalid response."""
+    del url, timeout
+    response = {"response_code": 204, "error": "Reach the API limits"}
+    return response
+
+
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
@@ -115,6 +122,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
     """Unittest for the lifecyle of the virustotal agent :
     Case where the Virus Total public API response is invalid.
     """
+    mocker.patch("time.sleep")
 
     def virustotal_invalid_response(message: msg.Message) -> dict[str, Any]:
         """Method for mocking the virustotal public api invalid response."""
@@ -135,7 +143,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
 
     virustotal_agent.process(message)
 
-    assert get_scans_mocker.call_count == 1
+    assert get_scans_mocker.call_count == 2
 
 
 def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
@@ -300,3 +308,38 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiErro
 
     with pytest.raises(virustotal.VirusTotalApiError):
         virustotal.get_scans(response)
+
+
+def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message: msg.Message,
+) -> None:
+    """Unit test for the lifecyle of the virustotal agent:
+    Case when the whitelist_types arg not provided agent shouldn't crash
+    """
+    mocker.patch("time.sleep")
+    get_file_content_mock = mocker.patch(
+        "agent.file.get_file_content", return_value=b""
+    )
+
+    virustotal_agent.process(message)
+
+    assert get_file_content_mock.call_count == 1
+
+
+def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_retryThenRaiseVirusTotalApiError(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    url_message: msg.Message,
+) -> None:
+    """Unit test for the lifecyle of the virustotal agent :
+    Case where the Virus Total public API reached the rate limit.
+    """
+    mocker.patch("time.sleep")
+    get_file_mock = mocker.patch(
+        "agent.virustotal.scan_url_from_message",
+        side_effect=virustotal_url_invalid_response,
+    )
+    virustotal_agent.process(url_message)
+    assert get_file_mock.call_count == 2
