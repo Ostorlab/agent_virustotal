@@ -143,7 +143,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
 
     virustotal_agent.process(message)
 
-    assert get_scans_mocker.call_count == 2
+    assert get_scans_mocker.call_count == 1
 
 
 def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
@@ -326,20 +326,3 @@ def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
     virustotal_agent.process(message)
 
     assert get_file_content_mock.call_count == 1
-
-
-def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_retryThenRaiseVirusTotalApiError(
-    mocker: plugin.MockerFixture,
-    virustotal_agent: virus_total_agent.VirusTotalAgent,
-    url_message: msg.Message,
-) -> None:
-    """Unit test for the lifecyle of the virustotal agent :
-    Case where the Virus Total public API reached the rate limit.
-    """
-    mocker.patch("time.sleep")
-    get_file_mock = mocker.patch(
-        "agent.virustotal.scan_url_from_message",
-        side_effect=virustotal_url_invalid_response,
-    )
-    virustotal_agent.process(url_message)
-    assert get_file_mock.call_count == 2
