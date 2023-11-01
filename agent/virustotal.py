@@ -59,7 +59,6 @@ def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
         VirusTotalApiError: In case the API request encountered problems.
     """
     if response.get("response_code") == 204 and response.get("error") is not None:
-        logger.error("Exceeded the virustotal API rate limit.")
         raise VirusTotalApiError()
     elif response.get("response_code") == 0 or "results" not in response:
         raise VirusTotalApiError()

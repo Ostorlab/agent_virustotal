@@ -18,7 +18,6 @@ from agent import virustotal
 logger = logging.getLogger(__name__)
 
 NUMBER_RETRIES = 2
-WAIT_TIME = 60
 
 
 class VirusTotalAgent(
@@ -37,7 +36,7 @@ class VirusTotalAgent(
             agent_settings: Settings of running instance of the agent.
         """
         super().__init__(agent_definition, agent_settings)
-        self.api_key: str | None = self.args.get("api_key")
+        self.api_key = self.args.get("api_key")
         self.whitelist_types = self.args.get("whitelist_types") or []
 
     def process(self, message: msg.Message) -> None:
@@ -59,44 +58,30 @@ class VirusTotalAgent(
                 not in self.whitelist_types
             ):
                 return None
-            self._scan_file(file_content, message.data.get("path"))
+            self.scan_file(file_content, message.data.get("path"))
         else:
             targets = self._prepare_targets(message)
             for target in targets:
-                self._scan_url(target)
+                response = virustotal.scan_url_from_message(target, self.api_key)
+                self._process_response(response, target)
 
     @tenacity.retry(
         stop=tenacity.stop_after_attempt(NUMBER_RETRIES),
-        wait=tenacity.wait_fixed(WAIT_TIME),
-        retry=tenacity.retry_if_exception_type(virustotal.VirusTotalApiError),
-        retry_error_callback=lambda retry_state: None,
+        retry=tenacity.retry_if_exception_type(),
+        retry_error_callback=lambda retry_state: retry_state.outcome.result()
+        if retry_state.outcome is not None
+        else None,
     )
-    def _scan_file(self, file_content: bytes, target: str | None) -> None:
-        """Send file to VirusTotal to be scanned, and process the response.
+    def scan_file(self, file_content: bytes, target: str | None) -> None:
+        """Send file to VirusTotal to be scanned.
         Args:
             file_content: the content to be scanned.
             target: target to scan.
         """
-        if self.api_key is not None:
-            response = virustotal.scan_file_from_message(
-                file_content=file_content, api_key=self.api_key
-            )
-            self._process_response(response, target)
-
-    @tenacity.retry(
-        stop=tenacity.stop_after_attempt(NUMBER_RETRIES),
-        wait=tenacity.wait_fixed(WAIT_TIME),
-        retry=tenacity.retry_if_exception_type(virustotal.VirusTotalApiError),
-        retry_error_callback=lambda retry_state: None,
-    )
-    def _scan_url(self, target: str) -> None:
-        """Send url to VirusTotal to be scanned, and process the response.
-        Args:
-            target: target to scan.
-        """
-        if self.api_key is not None:
-            response = virustotal.scan_url_from_message(target, self.api_key)
-            self._process_response(response, target)
+        response = virustotal.scan_file_from_message(
+            file_content=file_content, api_key=self.api_key
+        )
+        self._process_response(response, target)
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
         scans = virustotal.get_scans(response)
