@@ -37,7 +37,7 @@ class VirusTotalAgent(
             agent_settings: Settings of running instance of the agent.
         """
         super().__init__(agent_definition, agent_settings)
-        self.api_key = self.args.get("api_key", "")
+        self.api_key: str | None = self.args.get("api_key")
         self.whitelist_types = self.args.get("whitelist_types") or []
 
     def process(self, message: msg.Message) -> None:
@@ -94,8 +94,9 @@ class VirusTotalAgent(
         Args:
             target: target to scan.
         """
-        response = virustotal.scan_url_from_message(target, self.api_key)
-        self._process_response(response, target)
+        if self.api_key is not None:
+            response = virustotal.scan_url_from_message(target, self.api_key)
+            self._process_response(response, target)
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
         scans = virustotal.get_scans(response)
