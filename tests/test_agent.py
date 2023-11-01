@@ -41,13 +41,6 @@ def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     return response
 
 
-def virustotal_url_invalid_response(url: str, timeout: int) -> dict[str, Any]:
-    """Method for mocking the Virus Total public API invalid response."""
-    del url, timeout
-    response = {"response_code": 204, "error": "Reach the API limits"}
-    return response
-
-
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],

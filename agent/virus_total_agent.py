@@ -66,7 +66,12 @@ class VirusTotalAgent(
                 self._process_response(response, target)
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
-        scans = virustotal.get_scans(response)
+        try:
+            scans = virustotal.get_scans(response)
+        except virustotal.VirusTotalApiError:
+            logger.error("Virus Total API encountered some problems. Please try again.")
+            return None
+
         try:
             if scans is not None:
                 technical_detail = process_scans.get_technical_details(scans, target)
