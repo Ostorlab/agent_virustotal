@@ -44,7 +44,6 @@ class VirusTotalAgent(
             message: Message containing the file to scan.
 
         Raises:
-            VirusTotalApiError: In case the Virus Total api encountered problems.
             NameError: In case the scans were not defined.
         """
         file_content = file.get_file_content(message)
@@ -66,12 +65,7 @@ class VirusTotalAgent(
                 self._process_response(response, target)
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
-        try:
-            scans = virustotal.get_scans(response)
-        except virustotal.VirusTotalApiError:
-            logger.error("Virus Total API encountered some problems. Please try again.")
-            return None
-
+        scans = virustotal.get_scans(response)
         try:
             if scans is not None:
                 technical_detail = process_scans.get_technical_details(scans, target)

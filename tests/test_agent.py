@@ -41,7 +41,7 @@ def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     return response
 
 
-def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
     virustotal_agent: virus_total_agent.VirusTotalAgent,
@@ -85,13 +85,8 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noRaiseVirusTotalA
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_valid_response,
     )
+    virustotal_agent.process(message)
 
-    try:
-        virustotal_agent.process(message)
-    except virustotal.VirusTotalApiError:
-        pytest.fail(
-            "Unexpected VirusTotalApiError because response is returned with status 200."
-        )
     assert len(agent_mock) == 1
     assert agent_mock[0].selector == "v3.report.vulnerability"
     assert agent_mock[0].data["risk_rating"] == "HIGH"
@@ -130,9 +125,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_invalid_response,
     )
-    get_scans_mocker = mocker.patch(
-        "agent.virustotal.get_scans", side_effect=virustotal.VirusTotalApiError
-    )
+    get_scans_mocker = mocker.patch("agent.virustotal.get_scans")
 
     virustotal_agent.process(message)
 
@@ -286,7 +279,7 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
     )
 
 
-def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiError(
+def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_returnNone(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:

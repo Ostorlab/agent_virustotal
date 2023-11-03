@@ -14,10 +14,6 @@ class Error(Exception):
     """Custom Error."""
 
 
-class VirusTotalApiError(Error):
-    """VirtualTotalApiError."""
-
-
 def scan_file_from_message(file_content: bytes, api_key: str) -> dict:
     """Method responsible for scanning a file through the Virus Total public API.
     Args:
@@ -54,14 +50,8 @@ def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
 
     Returns:
         scans: Dictionary of the scans.
-
-    Raises:
-        VirusTotalApiError: In case the API request encountered problems.
     """
-    if response.get("response_code") == 0:
-        logger.warning("Target not present in VirusTotal's dataset.")
-        return None
-    elif response.get("results", {}).get("response_code") == 1:
+    if response.get("results", {}).get("response_code") == 1:
         return response["results"]["scans"]
     else:
         return None
