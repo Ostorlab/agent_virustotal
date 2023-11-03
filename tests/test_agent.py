@@ -115,6 +115,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
     """Unittest for the lifecyle of the virustotal agent :
     Case where the Virus Total public API response is invalid.
     """
+    mocker.patch("time.sleep")
 
     def virustotal_invalid_response(message: msg.Message) -> dict[str, Any]:
         """Method for mocking the virustotal public api invalid response."""
@@ -311,6 +312,7 @@ def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
     """Unit test for the lifecyle of the virustotal agent:
     Case when the whitelist_types arg not provided agent shouldn't crash
     """
+    mocker.patch("time.sleep")
     get_file_content_mock = mocker.patch(
         "agent.file.get_file_content", return_value=b""
     )
