@@ -58,9 +58,9 @@ def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
     Raises:
         VirusTotalApiError: In case the API request encountered problems.
     """
-    if response.get("response_code") == 0 or "results" not in response:
+    if response.get("response_code") == 0:
         raise VirusTotalApiError()
-    elif response["results"]["response_code"] == 1:
+    elif response.get("results", {}).get("response_code") == 1:
         return response["results"]["scans"]
     else:
         return None

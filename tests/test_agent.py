@@ -298,8 +298,9 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_raiseVirusTotalApiErro
         "response_code": 204,
     }
 
-    with pytest.raises(virustotal.VirusTotalApiError):
-        virustotal.get_scans(response)
+    scans = virustotal.get_scans(response)
+
+    assert scans is None
 
 
 def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
