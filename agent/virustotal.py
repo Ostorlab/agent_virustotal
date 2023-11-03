@@ -59,7 +59,8 @@ def get_scans(response: dict[str, Any]) -> dict[str, Any] | None:
         VirusTotalApiError: In case the API request encountered problems.
     """
     if response.get("response_code") == 0:
-        raise VirusTotalApiError()
+        logger.warning("Target not present in VirusTotal's dataset.")
+        return None
     elif response.get("results", {}).get("response_code") == 1:
         return response["results"]["scans"]
     else:
