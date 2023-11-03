@@ -4,7 +4,6 @@ import re
 from typing import Any
 import requests_mock as rq_mock
 
-import pytest
 from ostorlab.agent.message import message as msg
 from pytest_mock import plugin
 
