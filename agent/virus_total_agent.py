@@ -64,6 +64,7 @@ class VirusTotalAgent(
                 not in self.whitelist_types
             ):
                 return None
+            logger.info("Scanning file target with message %s", message.data)
             response = virustotal.scan_file_from_message(
                 file_content=file_content, api_key=self.api_key
             )
@@ -75,6 +76,8 @@ class VirusTotalAgent(
                 self._process_response(response, target)
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
+        if target is None:
+            return
         scans = virustotal.get_scans(response)
         try:
             if scans is not None:

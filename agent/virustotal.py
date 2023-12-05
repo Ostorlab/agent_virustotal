@@ -37,6 +37,7 @@ def scan_url_from_message(target: str, api_key: str) -> dict:
     Returns:
         response: The response of the Virus Total public API.
     """
+    logger.info("Scanning URL target %s", target)
     virustotal_client = virus_total_apis.PublicApi(api_key)
     response = virustotal_client.get_url_report(target, timeout=TIMEOUT_REQUEST)
     return response
