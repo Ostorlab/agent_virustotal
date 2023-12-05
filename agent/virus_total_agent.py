@@ -9,10 +9,20 @@ from ostorlab.agent.kb import kb
 from ostorlab.agent.message import message as msg
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.runtimes import definitions as runtime_definitions
+from rich import logging as rich_logging
 
 from agent import file
 from agent import process_scans
 from agent import virustotal
+
+
+logging.basicConfig(
+    format="%(message)s",
+    datefmt="[%X]",
+    level="INFO",
+    force=True,
+    handlers=[rich_logging.RichHandler(rich_tracebacks=True)],
+)
 
 logger = logging.getLogger(__name__)
 
