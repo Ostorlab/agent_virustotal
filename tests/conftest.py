@@ -118,3 +118,14 @@ def virustotal_agent_with_whitelist() -> virus_total_agent.VirusTotalAgent:
     )
 
     return agent
+
+
+@pytest.fixture()
+def message_without_path() -> msg.Message:
+    """Creates a dummy message of type v3.asset.file without a path attribute."""
+    file_content = (
+        pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
+    ).read_bytes()
+    selector = "v3.asset.file"
+    msg_data = {"content": file_content}
+    return msg.Message.from_data(selector, data=msg_data)
