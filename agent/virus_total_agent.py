@@ -68,9 +68,7 @@ class VirusTotalAgent(
             response = virustotal.scan_file_from_message(
                 file_content=file_content, api_key=self.api_key
             )
-            target = message.data.get("path")
-            if target is None:
-                target = hashlib.md5(file_content).hexdigest()
+            target = message.data.get("path") or hashlib.md5(file_content).hexdigest()
             self._process_response(response, target)
         else:
             targets = self._prepare_targets(message)
