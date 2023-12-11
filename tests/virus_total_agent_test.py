@@ -328,6 +328,7 @@ def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
     )
 
     virustotal_agent.process(message_without_path)
+    
     assert len(agent_mock) == 1
     assert agent_mock[0].data["technical_detail"] == (
         "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |  \n"
