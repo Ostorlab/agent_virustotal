@@ -40,6 +40,35 @@ def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     return response
 
 
+def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
+    """Method for mocking the Virus Total public API valid response."""
+    del message
+    response = {
+        "results": {
+            "scans": {
+                "Bkav": {
+                    "detected": False,
+                    "version": "1.3.0.9899",
+                    "result": None,
+                    "update": "20220107",
+                },
+                "Elastic": {
+                    "detected": True,
+                    "version": "4.0.32",
+                    "result": "eicar",
+                    "update": "20211223",
+                },
+            },
+            "scan_id": "ID42",
+            "sha1": "some_sha1",
+            "resource": "some_ressource_id",
+            "response_code": 1,
+        },
+        "response_code": 200,
+    }
+    return response
+
+
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
@@ -51,34 +80,6 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
     """
-
-    def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
-        """Method for mocking the Virus Total public API valid response."""
-        del message
-        response = {
-            "results": {
-                "scans": {
-                    "Bkav": {
-                        "detected": False,
-                        "version": "1.3.0.9899",
-                        "result": None,
-                        "update": "20220107",
-                    },
-                    "Elastic": {
-                        "detected": True,
-                        "version": "4.0.32",
-                        "result": "eicar",
-                        "update": "20211223",
-                    },
-                },
-                "scan_id": "ID42",
-                "sha1": "some_sha1",
-                "resource": "some_ressource_id",
-                "response_code": 1,
-            },
-            "response_code": 200,
-        }
-        return response
 
     mocker.patch(
         "virus_total_apis.PublicApi.get_file_report",
@@ -312,3 +313,24 @@ def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
     virustotal_agent.process(message)
 
     assert get_file_content_mock.call_count == 1
+
+
+def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message_without_path: msg.Message,
+    agent_mock: list[msg.Message],
+) -> None:
+    """Test that the target value defaults back to the file hash."""
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_valid_response,
+    )
+
+    virustotal_agent.process(message_without_path)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].data["technical_detail"] == (
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |  \n"
+        "|-------|----------|  \n|Bkav   |_Safe_    |  \n|Elastic|_Malicous_|  \n"
+    )
