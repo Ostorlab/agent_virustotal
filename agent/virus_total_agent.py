@@ -115,7 +115,7 @@ class VirusTotalAgent(
             else:
                 version = message.data.get("version")
                 if version not in (4, 6):
-                    raise ValueError(f"Incorrect ip version {version}")
+                    raise ValueError(f"Incorrect ip version {version}.")
                 elif version == 4 and int(mask) < IPV4_CIDR_LIMIT:
                     raise ValueError(
                         f"Subnet mask below {IPV4_CIDR_LIMIT} is not supported."

@@ -381,3 +381,12 @@ def testVirusTotalAgent_whenIPv6AssetDoesNotReachCIDRLimit_doesNotRaiseValueErro
     )
 
     virustotal_agent.process(scan_message_ipv6_with_mask112)
+
+
+def testVirusTotalAgent_whenIPAssetHasIncorrectVersion_raiseValueError(
+    scan_message_ipv_with_incorrect_version: msg.Message,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """Test the CIDR Limit in case IP has incorrect version."""
+    with pytest.raises(ValueError, match="Incorrect ip version 5."):
+        virustotal_agent.process(scan_message_ipv_with_incorrect_version)
