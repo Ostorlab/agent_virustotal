@@ -114,11 +114,13 @@ class VirusTotalAgent(
                 ip_network = ipaddress.ip_network(host)
             else:
                 version = message.data.get("version")
-                if version == 4 and int(mask) < IPV4_CIDR_LIMIT:
+                if version != 4 and version != 6:
+                    raise ValueError(f"Incorrect ip version {version}")
+                elif version == 4 and int(mask) < IPV4_CIDR_LIMIT:
                     raise ValueError(
                         f"Subnet mask below {IPV4_CIDR_LIMIT} is not supported."
                     )
-                if version == 6 and int(mask) < IPV6_CIDR_LIMIT:
+                elif version == 6 and int(mask) < IPV6_CIDR_LIMIT:
                     raise ValueError(
                         f"Subnet mask below {IPV6_CIDR_LIMIT} is not supported."
                     )
