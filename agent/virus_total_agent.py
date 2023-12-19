@@ -27,6 +27,9 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+IPV4_CIDR_LIMIT = 16
+IPV6_CIDR_LIMIT = 112
+
 
 class VirusTotalAgent(
     agent.Agent, agent_report_vulnerability_mixin.AgentReportVulnMixin
@@ -106,10 +109,19 @@ class VirusTotalAgent(
         from the config."""
         if message.data.get("host") is not None:
             host = str(message.data.get("host"))
-            if message.data.get("mask") is None:
+            mask = message.data.get("mask")
+            if mask is None:
                 ip_network = ipaddress.ip_network(host)
             else:
-                mask = message.data.get("mask")
+                version = message.data.get("version")
+                if version == 4 and int(mask) < IPV4_CIDR_LIMIT:
+                    raise ValueError(
+                        f"Subnet mask below {IPV4_CIDR_LIMIT} is not supported."
+                    )
+                if version == 6 and int(mask) < IPV6_CIDR_LIMIT:
+                    raise ValueError(
+                        f"Subnet mask below {IPV6_CIDR_LIMIT} is not supported."
+                    )
                 ip_network = ipaddress.ip_network(f"{host}/{mask}", strict=False)
             return [str(h) for h in ip_network.hosts()]
 

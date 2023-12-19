@@ -6,6 +6,7 @@ import requests_mock as rq_mock
 
 from ostorlab.agent.message import message as msg
 from pytest_mock import plugin
+import pytest
 
 from agent import virus_total_agent
 from agent import virustotal
@@ -334,3 +335,61 @@ def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
         "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |  \n"
         "|-------|----------|  \n|Bkav   |_Safe_    |  \n|Elastic|_Malicous_|  \n"
     )
+
+
+def testPrepareTargets_whenIPv4AssetReachCIDRLimit_raiseValueError(
+    mocker: plugin.MockerFixture,
+    scan_message_ipv4_with_mask8: msg.Message,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """Test the CIDR Limit in case IPV4 and the Limit is reached."""
+    mocker.patch(
+        "agent.virustotal.scan_url_from_message",
+        return_value={},
+    )
+
+    with pytest.raises(ValueError, match="Subnet mask below 16 is not supported."):
+        virustotal_agent.process(scan_message_ipv4_with_mask8)
+
+
+def testPrepareTargets_whenIPv4AssetDoesNotReachCIDRLimit_doesNotRaiseValueError(
+    mocker: plugin.MockerFixture,
+    scan_message_ipv4_with_mask16: msg.Message,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """Test the CIDR Limit in case IPV4 and the Limit is not reached."""
+    mocker.patch(
+        "agent.virustotal.scan_url_from_message",
+        return_value={},
+    )
+
+    virustotal_agent.process(scan_message_ipv4_with_mask16)
+
+
+def testPrepareTargets_whenIPv6AssetReachCIDRLimit_raiseValueError(
+    mocker: plugin.MockerFixture,
+    scan_message_ipv6_with_mask64: msg.Message,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """Test the CIDR Limit in case IPV6 and the Limit is reached."""
+    mocker.patch(
+        "agent.virustotal.scan_url_from_message",
+        return_value={},
+    )
+
+    with pytest.raises(ValueError, match="Subnet mask below 112 is not supported."):
+        virustotal_agent.process(scan_message_ipv6_with_mask64)
+
+
+def testPrepareTargets_whenIPv6AssetDoesNotReachCIDRLimit_doesNotRaiseValueError(
+    mocker: plugin.MockerFixture,
+    scan_message_ipv6_with_mask112: msg.Message,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """Test the CIDR Limit in case IPV6 and the Limit is not reached."""
+    mocker.patch(
+        "agent.virustotal.scan_url_from_message",
+        return_value={},
+    )
+
+    virustotal_agent.process(scan_message_ipv6_with_mask112)
