@@ -114,7 +114,7 @@ class VirusTotalAgent(
                 ip_network = ipaddress.ip_network(host)
             else:
                 version = message.data.get("version")
-                if version != 4 and version != 6:
+                if version not in (4, 6):
                     raise ValueError(f"Incorrect ip version {version}")
                 elif version == 4 and int(mask) < IPV4_CIDR_LIMIT:
                     raise ValueError(
