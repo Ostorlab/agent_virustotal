@@ -6,7 +6,7 @@ from agent import markdown
 
 
 def get_risk_rating(
-    scans: dict[str, Any]
+    scans: dict[str, Any],
 ) -> agent_report_vulnerability_mixin.RiskRating:
     """Assign risk level based on scanned file report.
 
