@@ -2,11 +2,11 @@
 import pathlib
 import re
 from typing import Any
-import requests_mock as rq_mock
 
+import pytest
+import requests_mock as rq_mock
 from ostorlab.agent.message import message as msg
 from pytest_mock import plugin
-import pytest
 
 from agent import virus_total_agent
 from agent import virustotal
@@ -275,7 +275,7 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
 
     assert virustotal_call.called is True
     assert (
-        virustotal_call.last_request.query
+        virustotal_call.last_request.query  # type: ignore
         == "apikey=some_api_key&resource=e29efc13355681a4aa23f0623c2316b9"
     )
 
