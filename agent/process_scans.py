@@ -2,6 +2,7 @@
 from typing import Any
 
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
+
 from agent import markdown
 
 
@@ -30,9 +31,9 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
     Returns:
         technical_detail : Markdown table of the scans results.
     """
-    scans = markdown.prepare_data_for_markdown_formatting(scans)
+    formatted_scans = markdown.prepare_data_for_markdown_formatting(scans)
     technical_detail = ""
     if target is not None:
         technical_detail = f"Analysis of the target `{target}`:\n"
-    technical_detail += markdown.table_markdown(scans)
+    technical_detail += markdown.table_markdown(formatted_scans)
     return technical_detail

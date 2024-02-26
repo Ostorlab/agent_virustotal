@@ -1,4 +1,6 @@
 """Collection of functions to handle files."""
+from typing import cast
+
 import requests
 import tenacity
 from ostorlab.agent.message import message as m
@@ -41,7 +43,7 @@ def get_file_content(message: m.Message) -> bytes | None:
     """
     content = message.data.get("content")
     if content is not None and isinstance(content, bytes):
-        return content
+        return cast(bytes, content)
     content_url: str | None = message.data.get("content_url")
     if content_url is not None:
         return _download_file(content_url)

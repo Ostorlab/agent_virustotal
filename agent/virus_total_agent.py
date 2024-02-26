@@ -1,8 +1,9 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
+import hashlib
 import ipaddress
 import logging
 from typing import Any
-import hashlib
+from typing import cast
 
 import magic
 from ostorlab.agent import agent, definitions as agent_definitions
@@ -15,7 +16,6 @@ from rich import logging as rich_logging
 from agent import file
 from agent import process_scans
 from agent import virustotal
-
 
 logging.basicConfig(
     format="%(message)s",
@@ -47,7 +47,11 @@ class VirusTotalAgent(
             agent_settings: Settings of running instance of the agent.
         """
         super().__init__(agent_definition, agent_settings)
-        self.api_key = self.args.get("api_key")
+        api_key = self.args.get("api_key")
+        if api_key is None:
+            raise ValueError("Virustotal API Key is not set")
+        else:
+            self.api_key = cast(str, api_key)
         self.whitelist_types = self.args.get("whitelist_types") or []
 
     def process(self, message: msg.Message) -> None:
