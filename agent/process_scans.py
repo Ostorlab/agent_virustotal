@@ -7,7 +7,7 @@ from agent import markdown
 
 
 def get_risk_rating(
-    scans: dict[str, Any]
+    scans: dict[str, Any],
 ) -> agent_report_vulnerability_mixin.RiskRating:
     """Assign risk level based on scanned file report.
 
@@ -44,9 +44,11 @@ def split_scans_by_result(
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     secure_scans: dict[str, Any] = dict()
     vulnerable_scans: dict[str, Any] = dict()
+
     for scan_type, scan_result in scans.items():
         if scan_result["detected"] is True:
             vulnerable_scans[scan_type] = scan_result
         else:
             secure_scans[scan_type] = scan_result
+
     return secure_scans, vulnerable_scans
