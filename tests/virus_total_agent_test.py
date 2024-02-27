@@ -88,16 +88,25 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     )
     virustotal_agent.process(message)
 
-    assert len(agent_mock) == 1
-    assert agent_mock[0].selector == "v3.report.vulnerability"
-    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert len(agent_mock) == 2
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "SECURE"
+    assert agent_mock[1].data["risk_rating"] == "HIGH"
     assert (
-        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+        agent_mock[0].data["title"]
+        == "Secure Virustotal malware analysis (MD5 based search)"
+    )
+    assert (
+        agent_mock[1].data["title"]
+        == "Vulnerable Virustotal malware analysis (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
-    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
-    assert agent_mock[0].data["privacy_issue"]
-    assert agent_mock[0].data["security_issue"]
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["privacy_issue"] is True
+    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -151,16 +160,25 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(url_message)
 
-    assert len(agent_mock) == 1
-    assert agent_mock[0].selector == "v3.report.vulnerability"
-    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert len(agent_mock) == 2
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "SECURE"
+    assert agent_mock[1].data["risk_rating"] == "HIGH"
     assert (
-        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+        agent_mock[0].data["title"]
+        == "Secure Virustotal malware analysis (MD5 based search)"
+    )
+    assert (
+        agent_mock[1].data["title"]
+        == "Vulnerable Virustotal malware analysis (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
-    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
-    assert agent_mock[0].data["privacy_issue"]
-    assert agent_mock[0].data["security_issue"]
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["privacy_issue"] is True
+    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -184,16 +202,25 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(create_domain_message)
 
-    assert len(agent_mock) == 1
-    assert agent_mock[0].selector == "v3.report.vulnerability"
-    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert len(agent_mock) == 2
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "SECURE"
+    assert agent_mock[1].data["risk_rating"] == "HIGH"
     assert (
-        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+        agent_mock[0].data["title"]
+        == "Secure Virustotal malware analysis (MD5 based search)"
+    )
+    assert (
+        agent_mock[1].data["title"]
+        == "Vulnerable Virustotal malware analysis (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
-    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
-    assert agent_mock[0].data["privacy_issue"]
-    assert agent_mock[0].data["security_issue"]
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["privacy_issue"] is True
+    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -217,11 +244,31 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(create_network_range_message)
 
-    assert len(agent_mock) == 14
+    assert len(agent_mock) == 28
     assert agent_mock[0].selector == "v3.report.vulnerability"
-    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert len([msg for msg in agent_mock if msg.data["risk_rating"] == "SECURE"]) == 14
+    assert len([msg for msg in agent_mock if msg.data["risk_rating"] == "HIGH"]) == 14
     assert (
-        agent_mock[0].data["title"] == "Virustotal malware analysis (MD5 based search)"
+        len(
+            [
+                msg
+                for msg in agent_mock
+                if msg.data["title"]
+                == "Secure Virustotal malware analysis (MD5 based search)"
+            ]
+        )
+        == 14
+    )
+    assert (
+        len(
+            [
+                msg
+                for msg in agent_mock
+                if msg.data["title"]
+                == "Vulnerable Virustotal malware analysis (MD5 based search)"
+            ]
+        )
+        == 14
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
     assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
@@ -330,10 +377,14 @@ def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
 
     virustotal_agent.process(message_without_path)
 
-    assert len(agent_mock) == 1
+    assert len(agent_mock) == 2
     assert agent_mock[0].data["technical_detail"] == (
-        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |  \n"
-        "|-------|----------|  \n|Bkav   |_Safe_    |  \n|Elastic|_Malicous_|  \n"
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|Result|"
+        "  \n|-------|------|  \n|Bkav   |_Safe_|  \n"
+    )
+    assert agent_mock[1].data["technical_detail"] == (
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result"
+        "  |  \n|-------|----------|  \n|Elastic|_Malicous_|  \n"
     )
 
 
