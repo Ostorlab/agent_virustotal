@@ -3,4 +3,5 @@ pytest
 pytest-cov
 pytest-mock
 requests-mock
+types-requests
 mypy
