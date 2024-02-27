@@ -20,9 +20,8 @@ jobs:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies.
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install -r tests/test-requirements.txt
-          python3 -m pip install -r typing-requirements.txt
+          python3 -m pip install -r requirement.txt
+          python3 -m pip install -r tests/test-requirement.txt
       - name: Running static types checker.
         run: |
           mypy
