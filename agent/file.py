@@ -27,7 +27,7 @@ def _download_file(file_url: str) -> bytes | None:
     """
     response = requests.get(file_url, timeout=DOWNLOAD_REQUEST_TIMEOUT)
     if response.status_code == 200:
-        return response.content
+        return cast(bytes, response.content)
 
     return None
 
