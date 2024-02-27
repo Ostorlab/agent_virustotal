@@ -27,7 +27,7 @@ def _download_file(file_url: str) -> bytes | None:
     """
     response = requests.get(file_url, timeout=DOWNLOAD_REQUEST_TIMEOUT)
     if response.status_code == 200:
-        return cast(bytes, response.content)
+        return response.content
 
     return None
 
@@ -46,6 +46,7 @@ def get_file_content(message: m.Message) -> bytes | None:
         return cast(bytes, content)
     content_url: str | None = message.data.get("content_url")
     if content_url is not None:
-        return _download_file(content_url)
+        remote_content = _download_file(content_url)
+        return remote_content
 
     return None
