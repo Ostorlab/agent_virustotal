@@ -92,7 +92,7 @@ class VirusTotalAgent(
                     vulnerable_scan_report,
                 ) = process_scans.split_scans_by_result(scans)
 
-                if len(secure_scan_report) != 0:
+                if len(secure_scan_report) > 0:
                     technical_detail = process_scans.get_technical_details(
                         secure_scan_report, target
                     )
@@ -102,7 +102,7 @@ class VirusTotalAgent(
                         risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
                     )
 
-                if len(vulnerable_scan_report) != 0:
+                if len(vulnerable_scan_report) > 0:
                     technical_detail = process_scans.get_technical_details(
                         vulnerable_scan_report, target
                     )
