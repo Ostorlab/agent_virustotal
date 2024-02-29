@@ -1,4 +1,5 @@
 """Processing scans returned by the Virus Total Public API."""
+
 from typing import Any
 
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin

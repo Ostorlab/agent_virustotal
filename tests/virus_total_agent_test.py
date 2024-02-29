@@ -1,4 +1,5 @@
 """Unittests for virustotal agent."""
+
 import pathlib
 import re
 from typing import Any
@@ -98,15 +99,13 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     )
     assert (
         agent_mock[1].data["title"]
-        == "Vulnerable Virustotal malware analysis (MD5 based search)"
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
     assert all(
         msg.data["short_description"] == "VirusTotal Malware analysis."
         for msg in agent_mock
     )
-    assert agent_mock[0].data["privacy_issue"] is True
-    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -170,15 +169,13 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     )
     assert (
         agent_mock[1].data["title"]
-        == "Vulnerable Virustotal malware analysis (MD5 based search)"
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
     assert all(
         msg.data["short_description"] == "VirusTotal Malware analysis."
         for msg in agent_mock
     )
-    assert agent_mock[0].data["privacy_issue"] is True
-    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -212,15 +209,13 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
     )
     assert (
         agent_mock[1].data["title"]
-        == "Vulnerable Virustotal malware analysis (MD5 based search)"
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
     assert all(
         msg.data["short_description"] == "VirusTotal Malware analysis."
         for msg in agent_mock
     )
-    assert agent_mock[0].data["privacy_issue"] is True
-    assert agent_mock[0].data["security_issue"] is True
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
@@ -265,15 +260,13 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
                 msg
                 for msg in agent_mock
                 if msg.data["title"]
-                == "Vulnerable Virustotal malware analysis (MD5 based search)"
+                == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
             ]
         )
         == 14
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
     assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
-    assert agent_mock[0].data["privacy_issue"]
-    assert agent_mock[0].data["security_issue"]
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]

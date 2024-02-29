@@ -1,4 +1,5 @@
 """Collection of functions to handle files."""
+
 from typing import cast
 
 import requests

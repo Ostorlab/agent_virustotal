@@ -1,4 +1,5 @@
 """Pytest fixtures for the virustotal agent."""
+
 import pathlib
 
 import pytest

@@ -1,4 +1,5 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
+
 import hashlib
 import ipaddress
 import logging
