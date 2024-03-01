@@ -1,6 +1,5 @@
 .dockerignore
 Dockerfile
-requirements.txt
 .github
 tests
 ruff.toml
