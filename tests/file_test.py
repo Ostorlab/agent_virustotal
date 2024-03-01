@@ -1,4 +1,5 @@
 """Tests for file"""
+
 import requests_mock as rq_mock
 from ostorlab.agent.message import message as m
 

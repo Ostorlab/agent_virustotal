@@ -1,4 +1,5 @@
 """VirusTotal agent implementation : Agent responsible for scanning a file through the Virus Total DB."""
+
 import hashlib
 import ipaddress
 import logging
@@ -87,13 +88,31 @@ class VirusTotalAgent(
         scans = virustotal.get_scans(response)
         try:
             if scans is not None:
-                technical_detail = process_scans.get_technical_details(scans, target)
-                risk_rating = process_scans.get_risk_rating(scans)
-                self.report_vulnerability(
-                    entry=kb.KB.VIRUSTOTAL_SCAN,
-                    technical_detail=technical_detail,
-                    risk_rating=risk_rating,
-                )
+                (
+                    secure_scan_report,
+                    vulnerable_scan_report,
+                ) = process_scans.split_scans_by_result(scans)
+
+                if len(secure_scan_report) > 0:
+                    technical_detail = process_scans.get_technical_details(
+                        secure_scan_report, target
+                    )
+                    self.report_vulnerability(
+                        entry=kb.KB.SECURE_VIRUSTOTAL_SCAN,
+                        technical_detail=technical_detail,
+                        risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
+                    )
+
+                if len(vulnerable_scan_report) > 0:
+                    technical_detail = process_scans.get_technical_details(
+                        vulnerable_scan_report, target
+                    )
+                    self.report_vulnerability(
+                        entry=kb.KB.INSECURE_VIRUSTOTAL_SCAN,
+                        technical_detail=technical_detail,
+                        risk_rating=agent_report_vulnerability_mixin.RiskRating.HIGH,
+                    )
+
         except NameError:
             logger.error("The scans list is empty.")
 

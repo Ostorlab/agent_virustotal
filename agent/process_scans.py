@@ -1,4 +1,5 @@
 """Processing scans returned by the Virus Total Public API."""
+
 from typing import Any
 
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
@@ -37,3 +38,18 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
         technical_detail = f"Analysis of the target `{target}`:\n"
     technical_detail += markdown.table_markdown(formatted_scans)
     return technical_detail
+
+
+def split_scans_by_result(
+    scans: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    secure_scans: dict[str, Any] = {}
+    vulnerable_scans: dict[str, Any] = {}
+
+    for scan_type, scan_result in scans.items():
+        if scan_result["detected"] is True:
+            vulnerable_scans[scan_type] = scan_result
+        else:
+            secure_scans[scan_type] = scan_result
+
+    return secure_scans, vulnerable_scans

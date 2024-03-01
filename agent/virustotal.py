@@ -1,4 +1,5 @@
 """Module responsible for interacting with Virus Total public API."""
+
 import hashlib
 import logging
 from typing import Any, cast
