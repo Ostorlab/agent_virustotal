@@ -2,23 +2,12 @@
 
 from typing import Any
 
-from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 
 from agent import markdown
 
-
-def get_risk_rating(
-    scans: dict[str, Any],
-) -> agent_report_vulnerability_mixin.RiskRating:
-    """Assign risk level based on scanned file report.
-
-    Returns:
-        'HIGH' if at least one anti-virus detected the file as a virus, else Secure.
-    """
-    for scanner_result in scans.values():
-        if scanner_result["detected"] is True:
-            return agent_report_vulnerability_mixin.RiskRating.HIGH
-    return agent_report_vulnerability_mixin.RiskRating.SECURE
+# These are tools used by VirusTotal to scan files that report a big
+# number of false positives, as a consequence their reports are excluded.
+EXCLUDED_SCANNERS = ["K7GW", "TrendMicro-HouseCall"]
 
 
 def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
@@ -40,16 +29,31 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
     return technical_detail
 
 
-def split_scans_by_result(
-    scans: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    secure_scans: dict[str, Any] = {}
-    vulnerable_scans: dict[str, Any] = {}
+def is_scan_malicious(scans: dict[str, Any]) -> bool:
+    """Checks if any scanner reports the target as malicious.
+    Args:
+        scans : Dictionary of the scans.
 
-    for scan_type, scan_result in scans.items():
+    Returns:
+        is_malicious : True if the target is reported as malicious false otherwise.
+    """
+    for scan_result in scans.values():
         if scan_result["detected"] is True:
-            vulnerable_scans[scan_type] = scan_result
-        else:
-            secure_scans[scan_type] = scan_result
+            return True
 
-    return secure_scans, vulnerable_scans
+    return False
+
+
+def exclude_unreliable_scans(scans: dict[str, Any]) -> dict[str, Any]:
+    """Excludes unreliable reports from the scans.
+
+    Args:
+        scans : Dictionary of the scans.
+
+    Returns:
+        scans: Dictionary of the scans with only reliable reports.
+    """
+    for scanner in EXCLUDED_SCANNERS:
+        scans.pop(scanner, None)
+
+    return scans
