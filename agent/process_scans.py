@@ -5,6 +5,8 @@ from typing import Any
 
 from agent import markdown
 
+# These are tools used by VirusTotal to scan files that report a big
+# number of false positives, as a consequence their reports are excluded.
 EXCLUDED_SCANNERS = ["K7GW", "TrendMicro-HouseCall"]
 
 
