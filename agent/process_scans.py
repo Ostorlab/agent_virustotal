@@ -28,6 +28,13 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
 
 
 def is_scan_malicious(scans: dict[str, Any]) -> bool:
+    """Checks if any scanner reports the target as malicious.
+    Args:
+        scans : Dictionary of the scans.
+
+    Returns:
+        is_malicious : True if the target is reported as malicious false otherwise.
+    """
     for scan_result in scans.values():
         if scan_result["detected"] is True:
             return True
@@ -36,6 +43,11 @@ def is_scan_malicious(scans: dict[str, Any]) -> bool:
 
 
 def exclude_unreliable_scans(scans: dict[str, Any]) -> None:
+    """Excludes unreliable reports from the scans.
+
+    Args:
+        scans : Dictionary of the scans.
+    """
     for scanner in EXCLUDED_SCANNERS:
         try:
             scans.pop(scanner)
