@@ -2,7 +2,6 @@
 
 from typing import Any
 
-from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 
 from agent import markdown
 
