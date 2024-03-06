@@ -71,6 +71,35 @@ def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
     return response
 
 
+def virustotal_secure_valid_response(message: msg.Message) -> dict[str, Any]:
+    """Method for mocking the Virus Total public API valid response."""
+    del message
+    response = {
+        "results": {
+            "scans": {
+                "Bkav": {
+                    "detected": False,
+                    "version": "1.3.0.9899",
+                    "result": None,
+                    "update": "20220107",
+                },
+                "Elastic": {
+                    "detected": False,
+                    "version": "4.0.32",
+                    "result": "eicar",
+                    "update": "20211223",
+                },
+            },
+            "scan_id": "ID42",
+            "sha1": "some_sha1",
+            "resource": "some_ressource_id",
+            "response_code": 1,
+        },
+        "response_code": 200,
+    }
+    return response
+
+
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
@@ -89,16 +118,11 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     )
     virustotal_agent.process(message)
 
-    assert len(agent_mock) == 2
+    assert len(agent_mock) == 1
     assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
-    assert agent_mock[0].data["risk_rating"] == "SECURE"
-    assert agent_mock[1].data["risk_rating"] == "HIGH"
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
-        == "Secure Virustotal malware analysis (MD5 based search)"
-    )
-    assert (
-        agent_mock[1].data["title"]
         == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
@@ -159,16 +183,11 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(url_message)
 
-    assert len(agent_mock) == 2
+    assert len(agent_mock) == 1
     assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
-    assert agent_mock[0].data["risk_rating"] == "SECURE"
-    assert agent_mock[1].data["risk_rating"] == "HIGH"
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
-        == "Secure Virustotal malware analysis (MD5 based search)"
-    )
-    assert (
-        agent_mock[1].data["title"]
         == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
@@ -199,16 +218,11 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(create_domain_message)
 
-    assert len(agent_mock) == 2
+    assert len(agent_mock) == 1
     assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
-    assert agent_mock[0].data["risk_rating"] == "SECURE"
-    assert agent_mock[1].data["risk_rating"] == "HIGH"
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
-        == "Secure Virustotal malware analysis (MD5 based search)"
-    )
-    assert (
-        agent_mock[1].data["title"]
         == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
@@ -239,21 +253,9 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
 
     virustotal_agent.process(create_network_range_message)
 
-    assert len(agent_mock) == 28
+    assert len(agent_mock) == 14
     assert agent_mock[0].selector == "v3.report.vulnerability"
-    assert len([msg for msg in agent_mock if msg.data["risk_rating"] == "SECURE"]) == 14
     assert len([msg for msg in agent_mock if msg.data["risk_rating"] == "HIGH"]) == 14
-    assert (
-        len(
-            [
-                msg
-                for msg in agent_mock
-                if msg.data["title"]
-                == "Secure Virustotal malware analysis (MD5 based search)"
-            ]
-        )
-        == 14
-    )
     assert (
         len(
             [
@@ -370,14 +372,10 @@ def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
 
     virustotal_agent.process(message_without_path)
 
-    assert len(agent_mock) == 2
+    assert len(agent_mock) == 1
     assert agent_mock[0].data["technical_detail"] == (
-        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|Result|"
-        "  \n|-------|------|  \n|Bkav   |_Safe_|  \n"
-    )
-    assert agent_mock[1].data["technical_detail"] == (
-        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result"
-        "  |  \n|-------|----------|  \n|Elastic|_Malicous_|  \n"
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |"
+        "  \n|-------|----------|  \n|Bkav   |_Safe_    |  \n|Elastic|_Malicous_|  \n"
     )
 
 
@@ -434,3 +432,34 @@ def testVirusTotalAgent_whenIPAssetHasIncorrectVersion_raiseValueError(
     """Test the CIDR Limit in case IP has incorrect version."""
     with pytest.raises(ValueError, match="Incorrect ip version 5."):
         virustotal_agent.process(scan_message_ipv_with_incorrect_version)
+
+
+def testVirusTotalAgent_whenReportIsSecure_shouldReportAsSecure(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message_without_path: msg.Message,
+    agent_mock: list[msg.Message],
+) -> None:
+    """Test that the agent report secure reports with correct kb entry."""
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_secure_valid_response,
+    )
+
+    virustotal_agent.process(message_without_path)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].data["risk_rating"] == "SECURE"
+    assert agent_mock[0].selector == "v3.report.vulnerability"
+    assert agent_mock[0].data["technical_detail"] == (
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|Result|"
+        "  \n|-------|------|  \n|Bkav   |_Safe_|  \n|Elastic|_Safe_|  \n"
+    )
+    assert (
+        agent_mock[0].data["title"]
+        == "Secure Virustotal malware analysis (MD5 based search)"
+    )
+    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]

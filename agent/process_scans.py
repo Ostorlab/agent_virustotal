@@ -40,16 +40,9 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
     return technical_detail
 
 
-def split_scans_by_result(
-    scans: dict[str, Any],
-) -> tuple[dict[str, Any], dict[str, Any]]:
-    secure_scans: dict[str, Any] = {}
-    vulnerable_scans: dict[str, Any] = {}
-
-    for scan_type, scan_result in scans.items():
+def is_scan_malicious(scans: dict[str, Any]) -> bool:
+    for scan_result in scans.values():
         if scan_result["detected"] is True:
-            vulnerable_scans[scan_type] = scan_result
-        else:
-            secure_scans[scan_type] = scan_result
+            return True
 
-    return secure_scans, vulnerable_scans
+    return False

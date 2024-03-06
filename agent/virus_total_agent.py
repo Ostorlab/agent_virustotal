@@ -88,29 +88,19 @@ class VirusTotalAgent(
         scans = virustotal.get_scans(response)
         try:
             if scans is not None:
-                (
-                    secure_scan_report,
-                    vulnerable_scan_report,
-                ) = process_scans.split_scans_by_result(scans)
+                technical_detail = process_scans.get_technical_details(scans, target)
 
-                if len(secure_scan_report) > 0:
-                    technical_detail = process_scans.get_technical_details(
-                        secure_scan_report, target
-                    )
-                    self.report_vulnerability(
-                        entry=kb.KB.SECURE_VIRUSTOTAL_SCAN,
-                        technical_detail=technical_detail,
-                        risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
-                    )
-
-                if len(vulnerable_scan_report) > 0:
-                    technical_detail = process_scans.get_technical_details(
-                        vulnerable_scan_report, target
-                    )
+                if process_scans.is_scan_malicious(scans) is True:
                     self.report_vulnerability(
                         entry=kb.KB.INSECURE_VIRUSTOTAL_SCAN,
                         technical_detail=technical_detail,
                         risk_rating=agent_report_vulnerability_mixin.RiskRating.HIGH,
+                    )
+                else:
+                    self.report_vulnerability(
+                        entry=kb.KB.SECURE_VIRUSTOTAL_SCAN,
+                        technical_detail=technical_detail,
+                        risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
                     )
 
         except NameError:
