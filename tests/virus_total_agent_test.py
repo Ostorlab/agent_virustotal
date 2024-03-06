@@ -100,6 +100,53 @@ def virustotal_secure_valid_response(message: msg.Message) -> dict[str, Any]:
     return response
 
 
+def virustotal_unreliable_scanner_response(message: msg.Message) -> dict[str, Any]:
+    """Method for mocking the Virus Total public API unreliable scanner response."""
+    del message
+    response = {
+        "results": {
+            "scans": {
+                "TrendMicro-HouseCall": {
+                    "detected": True,
+                    "result": None,
+                    "update": "20240305",
+                    "version": "2.0.0.8",
+                },
+                "K7GW": {
+                    "detected": True,
+                    "result": None,
+                    "update": "20240305",
+                    "version": "23.9.8494.0",
+                },
+                "Acronis": {
+                    "detected": False,
+                    "result": None,
+                    "update": "20230828",
+                    "version": "1.2.0.121",
+                },
+                "AhnLab-V3": {
+                    "detected": False,
+                    "result": None,
+                    "update": "20240305",
+                    "version": "3.25.1.10473",
+                },
+                "Alibaba": {
+                    "detected": False,
+                    "result": None,
+                    "update": "20190527",
+                    "version": "0.3.0.5",
+                },
+            },
+            "scan_id": "ID42",
+            "sha1": "some_sha1",
+            "resource": "some_ressource_id",
+            "response_code": 1,
+        },
+        "response_code": 200,
+    }
+    return response
+
+
 def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
@@ -454,6 +501,39 @@ def testVirusTotalAgent_whenReportIsSecure_shouldReportAsSecure(
     assert agent_mock[0].data["technical_detail"] == (
         "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|Result|"
         "  \n|-------|------|  \n|Bkav   |_Safe_|  \n|Elastic|_Safe_|  \n"
+    )
+    assert (
+        agent_mock[0].data["title"]
+        == "Secure Virustotal malware analysis (MD5 based search)"
+    )
+    assert agent_mock[0].data["short_description"] == "VirusTotal Malware analysis."
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+
+
+def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
+    mocker: plugin.MockerFixture,
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    message_without_path: msg.Message,
+    agent_mock: list[msg.Message],
+) -> None:
+    """Test that the agent exclude the unreliable scanners specified."""
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_unreliable_scanner_response,
+    )
+
+    virustotal_agent.process(message_without_path)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].data["risk_rating"] == "SECURE"
+    assert agent_mock[0].selector == "v3.report.vulnerability"
+    assert "K7GW" not in agent_mock[0].data["technical_detail"]
+    assert "TrendMicro-HouseCall" not in agent_mock[0].data["technical_detail"]
+    assert agent_mock[0].data["technical_detail"] == (
+        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n| Package |Result|"
+        "  \n|---------|------|  \n|Acronis  |_Safe_|  \n|AhnLab-V3|_Safe_|  \n|Alibaba  |_Safe_|  \n"
     )
     assert (
         agent_mock[0].data["title"]

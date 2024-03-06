@@ -6,19 +6,7 @@ from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 
 from agent import markdown
 
-
-def get_risk_rating(
-    scans: dict[str, Any],
-) -> agent_report_vulnerability_mixin.RiskRating:
-    """Assign risk level based on scanned file report.
-
-    Returns:
-        'HIGH' if at least one anti-virus detected the file as a virus, else Secure.
-    """
-    for scanner_result in scans.values():
-        if scanner_result["detected"] is True:
-            return agent_report_vulnerability_mixin.RiskRating.HIGH
-    return agent_report_vulnerability_mixin.RiskRating.SECURE
+EXCLUDED_SCANNERS = ["K7GW", "TrendMicro-HouseCall"]
 
 
 def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
@@ -46,3 +34,11 @@ def is_scan_malicious(scans: dict[str, Any]) -> bool:
             return True
 
     return False
+
+
+def exclude_unreliable_scans(scans: dict[str, Any]) -> None:
+    for scanner in EXCLUDED_SCANNERS:
+        try:
+            scans.pop(scanner)
+        except KeyError:
+            continue

@@ -88,6 +88,7 @@ class VirusTotalAgent(
         scans = virustotal.get_scans(response)
         try:
             if scans is not None:
+                process_scans.exclude_unreliable_scans(scans)
                 technical_detail = process_scans.get_technical_details(scans, target)
 
                 if process_scans.is_scan_malicious(scans) is True:
