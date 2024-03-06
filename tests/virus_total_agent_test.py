@@ -12,6 +12,72 @@ from pytest_mock import plugin
 from agent import virus_total_agent
 from agent import virustotal
 
+SECURE_VALID_RESPONSE = {
+    "results": {
+        "scans": {
+            "Bkav": {
+                "detected": False,
+                "version": "1.3.0.9899",
+                "result": None,
+                "update": "20220107",
+            },
+            "Elastic": {
+                "detected": False,
+                "version": "4.0.32",
+                "result": "eicar",
+                "update": "20211223",
+            },
+        },
+        "scan_id": "ID42",
+        "sha1": "some_sha1",
+        "resource": "some_ressource_id",
+        "response_code": 1,
+    },
+    "response_code": 200,
+}
+
+UNRELIABLE_SCANNERS_RESPONSE = {
+    "results": {
+        "scans": {
+            "TrendMicro-HouseCall": {
+                "detected": True,
+                "result": None,
+                "update": "20240305",
+                "version": "2.0.0.8",
+            },
+            "K7GW": {
+                "detected": True,
+                "result": None,
+                "update": "20240305",
+                "version": "23.9.8494.0",
+            },
+            "Acronis": {
+                "detected": False,
+                "result": None,
+                "update": "20230828",
+                "version": "1.2.0.121",
+            },
+            "AhnLab-V3": {
+                "detected": False,
+                "result": None,
+                "update": "20240305",
+                "version": "3.25.1.10473",
+            },
+            "Alibaba": {
+                "detected": False,
+                "result": None,
+                "update": "20190527",
+                "version": "0.3.0.5",
+            },
+        },
+        "scan_id": "ID42",
+        "sha1": "some_sha1",
+        "resource": "some_ressource_id",
+        "response_code": 1,
+    },
+    "response_code": 200,
+}
+
 
 def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
     """Method for mocking the Virus Total public API valid response."""
@@ -59,82 +125,6 @@ def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
                     "version": "4.0.32",
                     "result": "eicar",
                     "update": "20211223",
-                },
-            },
-            "scan_id": "ID42",
-            "sha1": "some_sha1",
-            "resource": "some_ressource_id",
-            "response_code": 1,
-        },
-        "response_code": 200,
-    }
-    return response
-
-
-def virustotal_secure_valid_response(message: msg.Message) -> dict[str, Any]:
-    """Method for mocking the Virus Total public API valid response."""
-    del message
-    response = {
-        "results": {
-            "scans": {
-                "Bkav": {
-                    "detected": False,
-                    "version": "1.3.0.9899",
-                    "result": None,
-                    "update": "20220107",
-                },
-                "Elastic": {
-                    "detected": False,
-                    "version": "4.0.32",
-                    "result": "eicar",
-                    "update": "20211223",
-                },
-            },
-            "scan_id": "ID42",
-            "sha1": "some_sha1",
-            "resource": "some_ressource_id",
-            "response_code": 1,
-        },
-        "response_code": 200,
-    }
-    return response
-
-
-def virustotal_unreliable_scanner_response(message: msg.Message) -> dict[str, Any]:
-    """Method for mocking the Virus Total public API unreliable scanner response."""
-    del message
-    response = {
-        "results": {
-            "scans": {
-                "TrendMicro-HouseCall": {
-                    "detected": True,
-                    "result": None,
-                    "update": "20240305",
-                    "version": "2.0.0.8",
-                },
-                "K7GW": {
-                    "detected": True,
-                    "result": None,
-                    "update": "20240305",
-                    "version": "23.9.8494.0",
-                },
-                "Acronis": {
-                    "detected": False,
-                    "result": None,
-                    "update": "20230828",
-                    "version": "1.2.0.121",
-                },
-                "AhnLab-V3": {
-                    "detected": False,
-                    "result": None,
-                    "update": "20240305",
-                    "version": "3.25.1.10473",
-                },
-                "Alibaba": {
-                    "detected": False,
-                    "result": None,
-                    "update": "20190527",
-                    "version": "0.3.0.5",
                 },
             },
             "scan_id": "ID42",
@@ -488,6 +478,12 @@ def testVirusTotalAgent_whenReportIsSecure_shouldReportAsSecure(
     agent_mock: list[msg.Message],
 ) -> None:
     """Test that the agent report secure reports with correct kb entry."""
+
+    def virustotal_secure_valid_response(message: msg.Message) -> dict[str, Any]:
+        """Method for mocking the Virus Total public API valid response."""
+        del message
+        return SECURE_VALID_RESPONSE
+
     mocker.patch(
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_secure_valid_response,
@@ -519,6 +515,12 @@ def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
     agent_mock: list[msg.Message],
 ) -> None:
     """Test that the agent exclude the unreliable scanners specified."""
+
+    def virustotal_unreliable_scanner_response(message: None) -> dict[str, Any]:
+        """Method for mocking the Virus Total public API unreliable scanner response."""
+        del message
+        return UNRELIABLE_SCANNERS_RESPONSE
+
     mocker.patch(
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_unreliable_scanner_response,

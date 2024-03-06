@@ -42,14 +42,16 @@ def is_scan_malicious(scans: dict[str, Any]) -> bool:
     return False
 
 
-def exclude_unreliable_scans(scans: dict[str, Any]) -> None:
+def exclude_unreliable_scans(scans: dict[str, Any]) -> dict[str, Any]:
     """Excludes unreliable reports from the scans.
 
     Args:
         scans : Dictionary of the scans.
+
+    Returns:
+        scans: Dictionary of the scans with only reliable reports.
     """
     for scanner in EXCLUDED_SCANNERS:
-        try:
-            scans.pop(scanner)
-        except KeyError:
-            continue
+        scans.pop(scanner, None)
+
+    return scans
