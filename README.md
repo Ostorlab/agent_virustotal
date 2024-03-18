@@ -21,32 +21,32 @@ This repository is an implementation of the VirusTotal agent.
 ## Getting Started
 To perform your first scan, simply run the following command.
 ```shell
-ostorlab scan run --install --agent agent/ostorlab/virustotal file malware.exe
+oxo scan run --install --agent agent/ostorlab/virustotal file malware.exe
 ```
 
 This command will download and install `agent/ostorlab/virustotal` and targets the file `malware.exe`.
-For more information, please refer to the [Ostorlab Documentation](https://github.com/Ostorlab/ostorlab/blob/main/README.md)
+For more information, please refer to the [OXO Documentation](https://oxo.ostorlab.co/docs)
 
 
 ## Usage
 
-Agent VirusTotal can be installed directly from the ostorlab agent store or built from this repository.
+Agent VirusTotal can be installed directly from the oxo agent store or built from this repository.
 
- ### Install directly from ostorlab agent store
+ ### Install directly from oxo agent store
 
  ```shell
- ostorlab agent install agent/ostorlab/virustotal
+ oxo agent install agent/ostorlab/virustotal
  ```
 
 You can then run the agent with the following command:
 ```shell
-ostorlab scan run --agent agent/ostorlab/virustotal file malware.exe
+oxo scan run --agent agent/ostorlab/virustotal file malware.exe
 ```
 
 
 ### Build directly from the repository
 
- 1. To build the virustotal agent you need to have [ostorlab](https://pypi.org/project/ostorlab/) installed in your machine.  if you have already installed ostorlab, you can skip this step.
+ 1. To build the virustotal agent you need to have [oxo](https://pypi.org/project/ostorlab/) installed in your machine.  if you have already installed oxo, you can skip this step.
 
 ```shell
 pip3 install ostorlab
@@ -58,7 +58,7 @@ pip3 install ostorlab
 git clone https://github.com/Ostorlab/agent_virus_total.git && cd agent_virus_total
 ```
 
- 3. Build the agent image using ostorlab cli.
+ 3. Build the agent image using oxo cli.
 
  ```shell
  ostortlab agent build --file=ostorlab.yaml
@@ -68,11 +68,11 @@ git clone https://github.com/Ostorlab/agent_virus_total.git && cd agent_virus_to
  4. Run the agent using one of the following commands:
 	 * If you did not specify an organization when building the image:
       ```shell
-      ostorlab scan run --agent agent//virustotal file malware.exe
+      oxo scan run --agent agent//virustotal file malware.exe
       ```
 	 * If you specified an organization when building the image:
       ```shell
-      ostorlab scan run --agent agent/[ORGANIZATION]/virustotal file malware.exe
+      oxo scan run --agent agent/[ORGANIZATION]/virustotal file malware.exe
       ```
 
 
