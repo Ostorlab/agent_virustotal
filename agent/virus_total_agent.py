@@ -86,10 +86,13 @@ class VirusTotalAgent(
 
     def _process_response(self, response: dict[str, Any], target: str | None) -> None:
         scans = virustotal.get_scans(response)
+        scans_link = response.get("results", {}).get("permalink")
         try:
             if scans is not None:
                 scans = process_scans.exclude_unreliable_scans(scans)
-                technical_detail = process_scans.get_technical_details(scans, target)
+                technical_detail = process_scans.get_technical_details(
+                    scans, target, scans_link
+                )
 
                 if process_scans.is_scan_malicious(scans) is True:
                     self.report_vulnerability(
