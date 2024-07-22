@@ -10,13 +10,16 @@ from agent import markdown
 EXCLUDED_SCANNERS = ["K7GW", "TrendMicro-HouseCall"]
 
 
-def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
+def get_technical_details(
+    scans: dict[str, Any], target: str | None, scans_link: str | None
+) -> str:
     """Returns a markdown table of the technical report of the scan.
     Each row presents an antivirus with corresponding scan result : Malicious/Safe.
 
     Args:
         scans : Dictionary of the scans.
         target : target to scan.
+        scans_link : Link to the scan report.
 
     Returns:
         technical_detail : Markdown table of the scans results.
@@ -26,6 +29,10 @@ def get_technical_details(scans: dict[str, Any], target: str | None) -> str:
     if target is not None:
         technical_detail = f"Analysis of the target `{target}`:\n"
     technical_detail += markdown.table_markdown(formatted_scans)
+    if scans_link is not None:
+        technical_detail += (
+            f"\nFor more details, visit the [scan report]({scans_link})."
+        )
     return technical_detail
 
 

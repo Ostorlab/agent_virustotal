@@ -102,6 +102,7 @@ def virustotal_url_valid_response(url: str, timeout: int) -> dict[str, Any]:
             "sha1": "some_sha1",
             "resource": "some_ressource_id",
             "response_code": 1,
+            "permalink": "http://www.virustotal.com/url/1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31/analysis/1320752364/",
         },
         "response_code": 200,
     }
@@ -131,6 +132,7 @@ def virustotal_valid_response(message: msg.Message) -> dict[str, Any]:
             "sha1": "some_sha1",
             "resource": "some_ressource_id",
             "response_code": 1,
+            "permalink": "https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/",
         },
         "response_code": 200,
     }
@@ -163,6 +165,10 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
         == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert (
+        "For more details, visit the [scan report](https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/)."
+        in agent_mock[0].data["technical_detail"]
+    )
     assert all(
         msg.data["short_description"] == "VirusTotal Malware analysis."
         for msg in agent_mock
@@ -228,6 +234,11 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
         == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
     )
     assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert (
+        "For more details, visit the [scan report]("
+        "http://www.virustotal.com/url/1db0ad7dbcec0676710ea0eaacd35d5e471d3e11944d53bcbd31f0cbd11bce31/analysis"
+        "/1320752364/)."
+    ) in agent_mock[0].data["technical_detail"]
     assert all(
         msg.data["short_description"] == "VirusTotal Malware analysis."
         for msg in agent_mock
@@ -410,9 +421,15 @@ def testVirusTotalAgent_whenFileHasNoPath_shouldReportWithHash(
     virustotal_agent.process(message_without_path)
 
     assert len(agent_mock) == 1
-    assert agent_mock[0].data["technical_detail"] == (
-        "Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:\n|Package|  Result  |"
-        "  \n|-------|----------|  \n|Bkav   |_Safe_    |  \n|Elastic|_Malicous_|  \n"
+    assert (
+        agent_mock[0].data["technical_detail"]
+        == """Analysis of the target `44d88612fea8a8f36de82e1278abb02f`:
+|Package|  Result  |  
+|-------|----------|  
+|Bkav   |_Safe_    |  
+|Elastic|_Malicous_|  
+
+For more details, visit the [scan report](https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/)."""
     )
 
 
