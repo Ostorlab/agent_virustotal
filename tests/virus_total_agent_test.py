@@ -145,7 +145,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unittest for the lifecycle of the virustotal agent :
     Sends a dummy malicious file through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
@@ -183,7 +183,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unittest for the lifecycle of the virustotal agent :
     Case where the Virus Total public API response is invalid.
     """
     mocker.patch("time.sleep")
@@ -214,7 +214,7 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     url_message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unittest for the lifecycle of the virustotal agent :
     Sends a dummy malicious url through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
@@ -254,7 +254,7 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     create_domain_message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unittest for the lifecycle of the virustotal agent :
     Sends a dummy malicious domain through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
@@ -289,7 +289,7 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     create_network_range_message: msg.Message,
 ) -> None:
-    """Unittest for the lifecyle of the virustotal agent :
+    """Unittest for the lifecycle of the virustotal agent :
     Sends a dummy malicious IP range through the Virus Total public API,
     receives a valid response, assign a risk rating, creates a technical detail
     and finally emits a message of type v3.report.vulnerability with the details above.
@@ -374,7 +374,7 @@ def testVirusTotalAgent_whenVirusTotalReachesApiRateLimit_returnNone(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unit test for the lifecyle of the virustotal agent :
+    """Unit test for the lifecycle of the virustotal agent :
     Case where the Virus Total public API reached the rate limit.
     """
 
@@ -393,7 +393,7 @@ def testVirusTotalAgent_whenWhiteListTypesAreNotProvided_shouldNotCrash(
     virustotal_agent: virus_total_agent.VirusTotalAgent,
     message: msg.Message,
 ) -> None:
-    """Unit test for the lifecyle of the virustotal agent:
+    """Unit test for the lifecycle of the virustotal agent:
     Case when the whitelist_types arg not provided agent shouldn't crash
     """
     mocker.patch("time.sleep")
