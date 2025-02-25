@@ -126,6 +126,7 @@ class VirusTotalAgent(
                         dna=common.compute_dna(
                             vuln_title=kb.KB.INSECURE_VIRUSTOTAL_SCAN.title,
                             vuln_location=vulnerability_location,
+                            scans=scans,
                         ),
                     )
                 else:
@@ -133,9 +134,11 @@ class VirusTotalAgent(
                         entry=kb.KB.SECURE_VIRUSTOTAL_SCAN,
                         technical_detail=technical_detail,
                         risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
+                        vulnerability_location=vulnerability_location,
                         dna=common.compute_dna(
                             vuln_title=kb.KB.SECURE_VIRUSTOTAL_SCAN.title,
                             vuln_location=vulnerability_location,
+                            scans=scans,
                         ),
                     )
 

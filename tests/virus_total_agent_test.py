@@ -178,7 +178,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"file": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"file": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -225,7 +225,12 @@ def testVirusTotalAgent_whenApkMessage_noExceptionRaised(
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"android_apk": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"android_apk": {"content": null, "content_url": null, "path": '
+        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
+        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
+        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
+        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
+        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -272,7 +277,17 @@ def testVirusTotalAgent_whenAabMessage_noExceptionRaised(
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"android_aab": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"android_aab": {"content": null, "content_url": null, "path": '
+        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
+        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
+        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
+        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
+        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    ) != (
+        '{"location": {"android_aab": {"content": null, "content_url": null, "path": '
+        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
+        '"some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) '
+        '(MD5 based search)"}'
     )
 
 
@@ -319,7 +334,17 @@ def testVirusTotalAgent_whenIpaMessage_noExceptionRaised(
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": '
+        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
+        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
+        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
+        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
+        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    ) != (
+        '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": '
+        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
+        '"some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) '
+        '(MD5 based search)"}'
     )
 
 
@@ -342,6 +367,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCr
             "verbose_msg": "Invalid resource, check what you are submitting",
         }
 
+    mocker.patch("agent.common.compute_dna", return_value={})
     mocker.patch(
         "virus_total_apis.PublicApi.get_file_report",
         side_effect=virustotal_invalid_response,
@@ -393,7 +419,7 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"domain_name": {"name": "virus.com"}, "metadata": [{"type": "URL", "value": "https://virus.com"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == """{"location": {"domain_name": {"name": "virus.com"}, "metadata": [{"type": "URL", "value": "https://virus.com"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}"""
     )
     assert agent_mock[0].data["vulnerability_location"] == {
         "domain_name": {"name": "virus.com"},
@@ -434,6 +460,14 @@ def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"domain_name": {"name": "apple.com"}, "metadata": [{"type": "URL", "value": "http://apple.com"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "domain_name": {"name": "apple.com"},
+        "metadata": [{"type": "URL", "value": "http://apple.com"}],
+    }
 
 
 def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
@@ -473,6 +507,13 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4}, "metadata": []}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4}
+    }
 
 
 def testVirusTotalAgent_whenWhitelistTypesIsSet_agentShouldIgnoreNonWhitelisted(
@@ -676,6 +717,13 @@ def testVirusTotalAgent_whenReportIsSecure_shouldReportAsSecure(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"file": {"content": null, "content_url": null, "path": null}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": false, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
+    )
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "metadata": [{"type": "FILE_PATH", "value": ""}]
+    }
 
 
 def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
@@ -715,3 +763,10 @@ def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"file": {"content": null, "content_url": null, "path": null}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Acronis": {"detected": false, "result": null, "update": "20230828", "version": "1.2.0.121"}, "AhnLab-V3": {"detected": false, "result": null, "update": "20240305", "version": "3.25.1.10473"}, "Alibaba": {"detected": false, "result": null, "update": "20190527", "version": "0.3.0.5"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
+    )
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "metadata": [{"type": "FILE_PATH", "value": ""}]
+    }

@@ -106,78 +106,104 @@ def build_vuln_location(
         | ios_ipa_asset.IOSIpa
     )
 
-    if file_path is not None:
-        if selector == "v3.asset.file.android.apk":
-            asset = android_apk_asset.AndroidApk(
-                path=file_path, content=file_content, content_url=content_url
-            )
-        elif selector == "v3.asset.file.android.aab":
-            asset = android_aab_asset.AndroidAab(
-                path=file_path, content=file_content, content_url=content_url
-            )
-        elif selector == "v3.asset.file.ios.ipa":
-            asset = ios_ipa_asset.IOSIpa(
-                path=file_path, content=file_content, content_url=content_url
-            )
-        else:
-            asset = file_asset.File(path=file_path, content=file_content)
+    if selector == "v3.asset.file.android.apk":
+        asset = android_apk_asset.AndroidApk(
+            path=file_path, content=file_content, content_url=content_url
+        )
         return agent_report_vulnerability_mixin.VulnerabilityLocation(
             asset=asset,
             metadata=[
                 agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
                     metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
-                    value=file_path,
+                    value=file_path or "",
                 )
             ],
         )
-
-    metadata = []
-    target = parse.urlparse(target_url)
-    ip = None
-    port = None
-    potential_ip = target_url
-    if target.scheme != "":
-        potential_ip = potential_ip.replace(f"{target.scheme}://", "")
-    if _is_ipv4(potential_ip) is True:
-        ip, port = _split_ipv4(potential_ip)
-        asset = ipv4_asset.IPv4(host=str(ip), version=4, mask="32")
-    elif _is_ipv6(potential_ip) is True:
-        asset = ipv6_asset.IPv6(host=str(potential_ip), version=6, mask="128")
+    elif selector == "v3.asset.file.android.aab":
+        asset = android_aab_asset.AndroidAab(
+            path=file_path, content=file_content, content_url=content_url
+        )
+        return agent_report_vulnerability_mixin.VulnerabilityLocation(
+            asset=asset,
+            metadata=[
+                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
+                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
+                    value=file_path or "",
+                )
+            ],
+        )
+    elif selector == "v3.asset.file.ios.ipa":
+        asset = ios_ipa_asset.IOSIpa(
+            path=file_path, content=file_content, content_url=content_url
+        )
+        return agent_report_vulnerability_mixin.VulnerabilityLocation(
+            asset=asset,
+            metadata=[
+                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
+                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
+                    value=file_path or "",
+                )
+            ],
+        )
+    elif selector == "v3.asset.file":
+        asset = file_asset.File(path=file_path, content=file_content)
+        return agent_report_vulnerability_mixin.VulnerabilityLocation(
+            asset=asset,
+            metadata=[
+                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
+                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
+                    value=file_path or "",
+                )
+            ],
+        )
     else:
-        full_url = parse.urlunparse(
-            (target.scheme, target.netloc, target.path, "", "", "")
-        )
-        metadata.append(
-            agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                metadata_type=agent_report_vulnerability_mixin.MetadataType.URL,
-                value=full_url,
+        metadata = []
+        target = parse.urlparse(target_url)
+        ip = None
+        port = None
+        potential_ip = target_url
+        if target.scheme != "":
+            potential_ip = potential_ip.replace(f"{target.scheme}://", "")
+        if _is_ipv4(potential_ip) is True:
+            ip, port = _split_ipv4(potential_ip)
+            asset = ipv4_asset.IPv4(host=str(ip), version=4, mask="32")
+        elif _is_ipv6(potential_ip) is True:
+            asset = ipv6_asset.IPv6(host=str(potential_ip), version=6, mask="128")
+        else:
+            full_url = parse.urlunparse(
+                (target.scheme, target.netloc, target.path, "", "", "")
             )
-        )
-        asset = domain_asset.DomainName(name=prepare_domain_asset(target_url))
-
-    if target.port is not None or (ip is not None and port is not None):
-        metadata_type = agent_report_vulnerability_mixin.MetadataType.PORT
-        metadata_value = str(target.port) if target.port is not None else port
-        if metadata_value is not None:
             metadata.append(
                 agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=metadata_type, value=metadata_value
+                    metadata_type=agent_report_vulnerability_mixin.MetadataType.URL,
+                    value=full_url,
                 )
             )
+            asset = domain_asset.DomainName(name=prepare_domain_asset(target_url))
 
-    return agent_report_vulnerability_mixin.VulnerabilityLocation(
-        asset=asset, metadata=metadata
-    )
+        if target.port is not None or (ip is not None and port is not None):
+            metadata_type = agent_report_vulnerability_mixin.MetadataType.PORT
+            metadata_value = str(target.port) if target.port is not None else port
+            if metadata_value is not None:
+                metadata.append(
+                    agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
+                        metadata_type=metadata_type, value=metadata_value
+                    )
+                )
+
+        return agent_report_vulnerability_mixin.VulnerabilityLocation(
+            asset=asset, metadata=metadata
+        )
 
 
-def prepare_domain_asset(url: str) -> str:
+def prepare_domain_asset(url: str | None) -> str:
     """Prepares the domain asset object for the given URL.
 
     Args:
-    url: The URL to extract the domain from.
+        url: The URL to extract the domain from.
 
     Returns:
-    Optional[domain_asset.DomainName]: A domain asset
+        domain_asset.DomainName: A domain asset
     """
     if url is None:
         return ""
@@ -202,12 +228,14 @@ def prepare_domain_asset(url: str) -> str:
 def compute_dna(
     vuln_title: str,
     vuln_location: agent_report_vulnerability_mixin.VulnerabilityLocation | None,
+    scans: dict[str, Any] | None = None,
 ) -> str:
     """Compute a deterministic, debuggable DNA representation for a vulnerability.
 
     Args:
         vuln_title: The title of the vulnerability.
         vuln_location: The location of the vulnerability.
+        scans: The location of the vulnerability.
 
     Returns:
         A deterministic JSON representation of the vulnerability DNA.
@@ -218,6 +246,9 @@ def compute_dna(
         location_dict: dict[str, Any] = vuln_location.to_dict()
         sorted_location_dict = sort_dict(location_dict)
         dna_data["location"] = sorted_location_dict
+
+    if scans is not None:
+        dna_data["scans"] = scans
 
     return json.dumps(dna_data, sort_keys=True)
 
