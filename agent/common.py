@@ -23,12 +23,12 @@ def prepare_host(host: str) -> str:
     Returns:
         The prepared host.
     """
-    if is_ipv6(host) is True:
+    if _is_ipv6(host) is True:
         return f"[{host}]"
     return host
 
 
-def is_ipv4(potential_ip: str) -> bool:
+def _is_ipv4(potential_ip: str) -> bool:
     """check if the potential_ip is a valid ipv4.
 
     Args:
@@ -37,7 +37,7 @@ def is_ipv4(potential_ip: str) -> bool:
     Returns:
         - boolean.
     """
-    ip, _ = split_ipv4(potential_ip)
+    ip, _ = _split_ipv4(potential_ip)
     try:
         ipaddress.IPv4Address(ip)
         return True
@@ -45,7 +45,7 @@ def is_ipv4(potential_ip: str) -> bool:
         return False
 
 
-def split_ipv4(potential_ip: str) -> tuple[str, str | None]:
+def _split_ipv4(potential_ip: str) -> tuple[str, str | None]:
     """split the potential_ip to get the ip and the port if existed.
 
     Args:
@@ -61,7 +61,7 @@ def split_ipv4(potential_ip: str) -> tuple[str, str | None]:
     return ip, port
 
 
-def is_ipv6(potential_ip: str) -> bool:
+def _is_ipv6(potential_ip: str) -> bool:
     """check if the potential_ip is a valid ipv6.
 
     Args:
@@ -138,10 +138,10 @@ def build_vuln_location(
     potential_ip = target_url
     if target.scheme != "":
         potential_ip = potential_ip.replace(f"{target.scheme}://", "")
-    if is_ipv4(potential_ip) is True:
-        ip, port = split_ipv4(potential_ip)
+    if _is_ipv4(potential_ip) is True:
+        ip, port = _split_ipv4(potential_ip)
         asset = ipv4_asset.IPv4(host=str(ip), version=4, mask="32")
-    elif is_ipv6(potential_ip) is True:
+    elif _is_ipv6(potential_ip) is True:
         asset = ipv6_asset.IPv6(host=str(potential_ip), version=6, mask="128")
     else:
         full_url = parse.urlunparse(

@@ -201,7 +201,7 @@ def testVirusTotalAgent_whenApkMessage_noExceptionRaised(
     virustotal_agent.process(apk_message)
 
     assert len(agent_mock) == 1
-    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock) is True
     assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
@@ -248,7 +248,7 @@ def testVirusTotalAgent_whenAabMessage_noExceptionRaised(
     virustotal_agent.process(aab_message)
 
     assert len(agent_mock) == 1
-    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock) is True
     assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
@@ -295,7 +295,7 @@ def testVirusTotalAgent_whenIpaMessage_noExceptionRaised(
     virustotal_agent.process(ios_message)
 
     assert len(agent_mock) == 1
-    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock) is True
     assert agent_mock[0].data["risk_rating"] == "HIGH"
     assert (
         agent_mock[0].data["title"]
