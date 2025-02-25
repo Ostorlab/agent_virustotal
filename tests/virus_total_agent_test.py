@@ -176,6 +176,151 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"file": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+
+
+def testVirusTotalAgent_whenApkMessage_noExceptionRaised(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    apk_message: msg.Message,
+) -> None:
+    """Unittest for the lifecycle of the virustotal agent :
+    Sends a dummy malicious file through the Virus Total public API,
+    receives a valid response, assign a risk rating, creates a technical detail
+    and finally emits a message of type v3.report.vulnerability with the details above.
+    """
+
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_valid_response,
+    )
+    virustotal_agent.process(apk_message)
+
+    assert len(agent_mock) == 1
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert (
+        agent_mock[0].data["title"]
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
+    )
+    assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert (
+        "For more details, visit the [scan report](https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/)."
+        in agent_mock[0].data["technical_detail"]
+    )
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "android_apk": {"path": "some/dummy/path"},
+        "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
+    }
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"android_apk": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+
+
+def testVirusTotalAgent_whenAabMessage_noExceptionRaised(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    aab_message: msg.Message,
+) -> None:
+    """Unittest for the lifecycle of the virustotal agent :
+    Sends a dummy malicious file through the Virus Total public API,
+    receives a valid response, assign a risk rating, creates a technical detail
+    and finally emits a message of type v3.report.vulnerability with the details above.
+    """
+
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_valid_response,
+    )
+    virustotal_agent.process(aab_message)
+
+    assert len(agent_mock) == 1
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert (
+        agent_mock[0].data["title"]
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
+    )
+    assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert (
+        "For more details, visit the [scan report](https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/)."
+        in agent_mock[0].data["technical_detail"]
+    )
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "android_aab": {"path": "some/dummy/path"},
+        "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
+    }
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"android_aab": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+
+
+def testVirusTotalAgent_whenIpaMessage_noExceptionRaised(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+    ios_message: msg.Message,
+) -> None:
+    """Unittest for the lifecycle of the virustotal agent :
+    Sends a dummy malicious file through the Virus Total public API,
+    receives a valid response, assign a risk rating, creates a technical detail
+    and finally emits a message of type v3.report.vulnerability with the details above.
+    """
+
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_valid_response,
+    )
+    virustotal_agent.process(ios_message)
+
+    assert len(agent_mock) == 1
+    assert all(msg.selector == "v3.report.vulnerability" for msg in agent_mock)
+    assert agent_mock[0].data["risk_rating"] == "HIGH"
+    assert (
+        agent_mock[0].data["title"]
+        == "VirusTotal scan flagged malicious asset(s) (MD5 based search)"
+    )
+    assert isinstance(agent_mock[0].data["technical_detail"], str)
+    assert (
+        "For more details, visit the [scan report](https://www.virustotal.com/file/52d3df0ed60c46f336c131bf2ca454f73bafdc4b04dfa2aea80746f5ba9e6d1c/analysis/1273894724/)."
+        in agent_mock[0].data["technical_detail"]
+    )
+    assert all(
+        msg.data["short_description"] == "VirusTotal Malware analysis."
+        for msg in agent_mock
+    )
+    assert agent_mock[0].data["references"] == [
+        {"title": "Virustotal", "url": "https://www.virustotal.com/"}
+    ]
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "ios_ipa": {"path": "some/dummy/path"},
+        "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
+    }
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
 
 
 def testVirusTotalAgent_whenVirusTotalApiReturnsInvalidResponse_agentShouldNotCrash(
@@ -246,6 +391,14 @@ def testVirusTotalAgent_whenLinkReceived_virusTotalApiReturnsValidResponse(
     assert agent_mock[0].data["references"] == [
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
+    assert (
+        agent_mock[0].data["dna"]
+        == '{"location": {"domain_name": {"name": "virus.com"}, "metadata": [{"type": "URL", "value": "https://virus.com"}]}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+    )
+    assert agent_mock[0].data["vulnerability_location"] == {
+        "domain_name": {"name": "virus.com"},
+        "metadata": [{"type": "URL", "value": "https://virus.com"}],
+    }
 
 
 def testVirusTotalAgent_whenDomainReceived_virusTotalApiReturnsValidResponse(
