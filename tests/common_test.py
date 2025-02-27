@@ -10,38 +10,22 @@ from ostorlab.assets import ipv6
 from agent import common
 
 
-def testPrepareHost_whenIPv6_returnHostInBrackets() -> None:
-    """Unit test for prepare_host, case when host is IPv6"""
-    host = "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
+@pytest.mark.parametrize(
+    "asset, host",
+    [
+        (
+            "2001:0db8:85a3:0000:0000:8a2e:0370:7334",
+            """[2001:0db8:85a3:0000:0000:8a2e:0370:7334]""",
+        ),
+        ("8.8.8.8", "8.8.8.8"),
+        ("example.com", "example.com"),
+        ("https://example.com", "https://example.com"),
+    ],
+)
+def testPrepareHost_whenAsset_returnValidPreparedAsset(asset: str, host: str) -> None:
+    """Unit test for prepare_host"""
 
-    prepared_host = common.prepare_host(host)
-
-    assert prepared_host == f"[{host}]"
-
-
-def testPrepareHost_whenIPv4_returnHost() -> None:
-    """Unit test for prepare_host, case when host is IPv4"""
-    host = "8.8.8.8"
-
-    prepared_host = common.prepare_host(host)
-
-    assert prepared_host == host
-
-
-def testPrepareHost_whenDomain_returnHost() -> None:
-    """Unit test for prepare_host, case when host is domain"""
-    host = "example.com"
-
-    prepared_host = common.prepare_host(host)
-
-    assert prepared_host == host
-
-
-def testPrepareHost_whenLink_returnHost() -> None:
-    """Unit test for prepare_host, case when host is link"""
-    host = "https://example.com"
-
-    prepared_host = common.prepare_host(host)
+    prepared_host = common.prepare_host(asset)
 
     assert prepared_host == host
 
