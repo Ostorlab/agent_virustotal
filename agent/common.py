@@ -78,12 +78,12 @@ def _is_ipv6(potential_ip: str) -> bool:
 
 
 def build_vuln_location(
-    target_url: str,
+    target_url: str | None,
     file_path: str | None = None,
     file_content: bytes | None = None,
     selector: str | None = None,
     content_url: str | None = None,
-) -> agent_report_vulnerability_mixin.VulnerabilityLocation:
+) -> agent_report_vulnerability_mixin.VulnerabilityLocation | None:
     """Build VulnerabilityLocation based on the asset.
 
     Args:
@@ -157,6 +157,8 @@ def build_vuln_location(
             ],
         )
     else:
+        if target_url is None:
+            return None
         metadata = []
         target = parse.urlparse(target_url)
         ip = None

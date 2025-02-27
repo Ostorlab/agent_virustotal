@@ -259,3 +259,8 @@ def testSortDict_always_returnsSortedDict(
 ) -> None:
     """Ensure sort_dict correctly sorts dictionary keys recursively."""
     assert common.sort_dict(unordered_dict) == expected
+
+
+def testBuildVulnLocation_whenTargerUrlIsNone_returnNone() -> None:
+    vuln_location = common.build_vuln_location(target_url=None)
+    assert vuln_location is None
