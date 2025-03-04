@@ -17,6 +17,7 @@ from rich import logging as rich_logging
 from agent import file
 from agent import process_scans
 from agent import virustotal
+from agent import common
 
 logging.basicConfig(
     format="%(message)s",
@@ -77,14 +78,32 @@ class VirusTotalAgent(
                 file_content=file_content, api_key=self.api_key
             )
             target = message.data.get("path") or hashlib.md5(file_content).hexdigest()
-            self._process_response(response, target)
+            self._process_response(
+                response=response,
+                target=target,
+                file_path=message.data.get("path"),
+                content_url=message.data.get("content_url"),
+                selector=message.selector,
+                message=message,
+            )
         else:
             targets = self._prepare_targets(message)
             for target in targets:
                 response = virustotal.scan_url_from_message(target, self.api_key)
-                self._process_response(response, target)
+                self._process_response(
+                    response=response, target=target, message=message
+                )
 
-    def _process_response(self, response: dict[str, Any], target: str | None) -> None:
+    def _process_response(
+        self,
+        message: msg.Message,
+        response: dict[str, Any],
+        target: str | None,
+        file_path: str | None = None,
+        file_content: bytes | None = None,
+        content_url: str | None = None,
+        selector: str | None = None,
+    ) -> None:
         scans = virustotal.get_scans(response)
         scans_link = response.get("results", {}).get("permalink")
         try:
@@ -93,18 +112,36 @@ class VirusTotalAgent(
                 technical_detail = process_scans.get_technical_details(
                     scans, target, scans_link
                 )
-
+                vulnerability_location = None
+                if target is not None:
+                    vulnerability_location = common.build_vuln_location(
+                        message=message,
+                        target_url=target,
+                        file_path=file_path,
+                    )
                 if process_scans.is_scan_malicious(scans) is True:
                     self.report_vulnerability(
                         entry=kb.KB.INSECURE_VIRUSTOTAL_SCAN,
                         technical_detail=technical_detail,
                         risk_rating=agent_report_vulnerability_mixin.RiskRating.HIGH,
+                        vulnerability_location=vulnerability_location,
+                        dna=common.compute_dna(
+                            vuln_title=kb.KB.INSECURE_VIRUSTOTAL_SCAN.title,
+                            vuln_location=vulnerability_location,
+                            scans=scans,
+                        ),
                     )
                 else:
                     self.report_vulnerability(
                         entry=kb.KB.SECURE_VIRUSTOTAL_SCAN,
                         technical_detail=technical_detail,
                         risk_rating=agent_report_vulnerability_mixin.RiskRating.SECURE,
+                        vulnerability_location=vulnerability_location,
+                        dna=common.compute_dna(
+                            vuln_title=kb.KB.SECURE_VIRUSTOTAL_SCAN.title,
+                            vuln_location=vulnerability_location,
+                            scans=scans,
+                        ),
                     )
 
         except NameError:

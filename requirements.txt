@@ -3,3 +3,4 @@ virustotal-api
 pytablewriter
 rich
 python-magic
+tld
