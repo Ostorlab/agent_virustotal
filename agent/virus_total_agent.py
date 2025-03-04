@@ -84,15 +84,19 @@ class VirusTotalAgent(
                 file_path=message.data.get("path"),
                 content_url=message.data.get("content_url"),
                 selector=message.selector,
+                message=message,
             )
         else:
             targets = self._prepare_targets(message)
             for target in targets:
                 response = virustotal.scan_url_from_message(target, self.api_key)
-                self._process_response(response, target)
+                self._process_response(
+                    response=response, target=target, message=message
+                )
 
     def _process_response(
         self,
+        message: msg.Message,
         response: dict[str, Any],
         target: str | None,
         file_path: str | None = None,
@@ -111,11 +115,9 @@ class VirusTotalAgent(
                 vulnerability_location = None
                 if target is not None:
                     vulnerability_location = common.build_vuln_location(
+                        message=message,
                         target_url=target,
                         file_path=file_path,
-                        file_content=file_content,
-                        content_url=content_url,
-                        selector=selector,
                     )
                 if process_scans.is_scan_malicious(scans) is True:
                     self.report_vulnerability(

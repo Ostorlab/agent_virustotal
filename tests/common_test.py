@@ -6,6 +6,7 @@ import pytest
 from ostorlab.assets import domain_name
 from ostorlab.assets import ipv4
 from ostorlab.assets import ipv6
+from ostorlab.agent.message import message as msg
 
 from agent import common
 
@@ -30,11 +31,15 @@ def testPrepareHost_whenAsset_returnValidPreparedAsset(asset: str, host: str) ->
     assert prepared_host == host
 
 
-def testBuildVulnLocation_whenMatchedAtIsIpv4_returnsVulnLocation() -> None:
+def testBuildVulnLocation_whenMatchedAtIsIpv4_returnsVulnLocation(
+    scan_message_ipv4_with_mask8: msg.Message,
+) -> None:
     """Ensure that when matched_at is an IPv4, BuildVulnLocation returns a valid VulnLocation."""
     matched_at = "70.70.70.70:443"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=scan_message_ipv4_with_mask8
+    )
 
     assert vuln_location is not None
     ipv4_asset = vuln_location.asset
@@ -52,11 +57,15 @@ def testBuildVulnLocation_whenMatchedAtIsIpv4_returnsVulnLocation() -> None:
     )
 
 
-def testBuildVulnLocation_whenMatchedAtIsIpv6_returnsVulnLocation() -> None:
+def testBuildVulnLocation_whenMatchedAtIsIpv6_returnsVulnLocation(
+    scan_message_ipv4_with_mask8: msg.Message,
+) -> None:
     """Ensure that when matched_at is an IPv6, BuildVulnLocation returns a valid VulnLocation."""
     matched_at = "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=scan_message_ipv4_with_mask8
+    )
 
     assert vuln_location is not None
     ipv6_asset = vuln_location.asset
@@ -67,11 +76,15 @@ def testBuildVulnLocation_whenMatchedAtIsIpv6_returnsVulnLocation() -> None:
     assert len(vuln_location.metadata) == 0
 
 
-def testBuildVulnLocation_whenMatchedAtIsDomain_returnsVulnLocation() -> None:
+def testBuildVulnLocation_whenMatchedAtIsDomain_returnsVulnLocation(
+    url_message: msg.Message,
+) -> None:
     """Ensure that when matched_at is a domain, BuildVulnLocation returns a valid VulnLocation."""
     matched_at = "https://www.google.com"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
 
     assert vuln_location is not None
     domain_asset = vuln_location.asset
@@ -87,13 +100,15 @@ def testBuildVulnLocation_whenMatchedAtIsDomain_returnsVulnLocation() -> None:
     )
 
 
-def testBuildVulnLocation_whenMatchedAtIsDomainWithPath_returnsVulnLocationWithUrlMetadata() -> (
-    None
-):
+def testBuildVulnLocation_whenMatchedAtIsDomainWithPath_returnsVulnLocationWithUrlMetadata(
+    url_message: msg.Message,
+) -> None:
     """Ensure that when matched_at is a domain with a path, build_vuln_location returns a valid VulnLocation with URL metadata."""
     matched_at = "https://www.google.com:443/path/to/something"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
 
     assert vuln_location is not None
     domain_asset = vuln_location.asset
@@ -117,13 +132,15 @@ def testBuildVulnLocation_whenMatchedAtIsDomainWithPath_returnsVulnLocationWithU
     )
 
 
-def testBuildVulnLocation_whenMatchedAtIsIpv4WithScheme_returnsValidVulnLocation() -> (
-    None
-):
+def testBuildVulnLocation_whenMatchedAtIsIpv4WithScheme_returnsValidVulnLocation(
+    scan_message_ipv4_with_mask8: msg.Message,
+) -> None:
     """Ensure that when a scheme is present, BuildVulnLocation returns a valid VulnLocation."""
     matched_at = "https://70.70.70.70"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=scan_message_ipv4_with_mask8
+    )
 
     assert vuln_location is not None
     ipv4_asset = vuln_location.asset
@@ -133,11 +150,15 @@ def testBuildVulnLocation_whenMatchedAtIsIpv4WithScheme_returnsValidVulnLocation
     assert ipv4_asset.mask == "32"
 
 
-def testBuildVulnLocation_whenMatchedAtHasPath_returnsVulnLocation() -> None:
+def testBuildVulnLocation_whenMatchedAtHasPath_returnsVulnLocation(
+    url_message: msg.Message,
+) -> None:
     """Ensure that when matched_at has a path, BuildVulnLocation returns a valid VulnLocation."""
     matched_at = "https://www.google.com/path/to/something"
 
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
 
     assert vuln_location is not None
     domain_asset = vuln_location.asset
@@ -145,11 +166,15 @@ def testBuildVulnLocation_whenMatchedAtHasPath_returnsVulnLocation() -> None:
     assert domain_asset.name == "www.google.com"
 
 
-def testComputeDna_whenVulnerabilityTitleAndDomainName_returnsDna() -> None:
+def testComputeDna_whenVulnerabilityTitleAndDomainName_returnsDna(
+    url_message: msg.Message,
+) -> None:
     """Ensure that when vulnerability_title and vuln_location is domain name, ComputeDna returns a valid DNA."""
     vulnerability_title = "Vulnerability Title Domain Name"
     matched_at = "https://www.google.com/path/to/something"
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
 
     dna = common.compute_dna(vulnerability_title, vuln_location)
 
@@ -160,11 +185,15 @@ def testComputeDna_whenVulnerabilityTitleAndDomainName_returnsDna() -> None:
     )
 
 
-def testComputeDna_whenVulnerabilityTitleAndIpv4_returnsDna() -> None:
+def testComputeDna_whenVulnerabilityTitleAndIpv4_returnsDna(
+    scan_message_ipv4_with_mask8: msg.Message,
+) -> None:
     """Ensure that when vulnerability_title and vuln_location is IPv4, ComputeDna returns a valid DNA."""
     vulnerability_title = "Vulnerability Title IPv4"
     matched_at = "https://70.70.70.70"
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=scan_message_ipv4_with_mask8
+    )
 
     dna = common.compute_dna(vulnerability_title, vuln_location)
 
@@ -175,11 +204,15 @@ def testComputeDna_whenVulnerabilityTitleAndIpv4_returnsDna() -> None:
     )
 
 
-def testComputeDna_whenVulnerabilityTitleAndIpv6_returnsDna() -> None:
+def testComputeDna_whenVulnerabilityTitleAndIpv6_returnsDna(
+    scan_message_ipv6_with_mask64: msg.Message,
+) -> None:
     """Ensure that when vulnerability_title and vuln_location is IPv6, ComputeDna returns a valid DNA."""
     vulnerability_title = "Vulnerability Title IPv6"
     matched_at = "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
-    vuln_location = common.build_vuln_location(matched_at)
+    vuln_location = common.build_vuln_location(
+        target_url=matched_at, message=scan_message_ipv6_with_mask64
+    )
 
     dna = common.compute_dna(vulnerability_title, vuln_location)
 
@@ -190,13 +223,19 @@ def testComputeDna_whenVulnerabilityTitleAndIpv6_returnsDna() -> None:
     )
 
 
-def testComputeDna_whenSameDomainDifferentPaths_returnsDifferentDna() -> None:
+def testComputeDna_whenSameDomainDifferentPaths_returnsDifferentDna(
+    url_message: msg.Message,
+) -> None:
     """Ensure that when the same domain with different paths, ComputeDna returns different DNA."""
     vulnerability_title = "Vulnerability Title Domain Name"
     matched_at_1 = "https://www.google.com/path/to/something"
     matched_at_2 = "https://www.google.com/another/path/to/something"
-    vuln_location_1 = common.build_vuln_location(matched_at_1)
-    vuln_location_2 = common.build_vuln_location(matched_at_2)
+    vuln_location_1 = common.build_vuln_location(
+        target_url=matched_at_1, message=url_message
+    )
+    vuln_location_2 = common.build_vuln_location(
+        target_url=matched_at_2, message=url_message
+    )
 
     dna_1 = common.compute_dna(vulnerability_title, vuln_location_1)
     dna_2 = common.compute_dna(vulnerability_title, vuln_location_2)
@@ -214,12 +253,18 @@ def testComputeDna_whenSameDomainDifferentPaths_returnsDifferentDna() -> None:
     )
 
 
-def testComputeDna_whenUnorderedDict_returnsConsistentDna() -> None:
+def testComputeDna_whenUnorderedDict_returnsConsistentDna(
+    url_message: msg.Message,
+) -> None:
     """Ensure that ComputeDna returns a consistent DNA when vuln_location dictionary keys are unordered."""
     vulnerability_title = "Vulnerability Title Unordered Dict"
     matched_at = "https://www.google.com:8080/path/to/something"
-    vuln_location1 = common.build_vuln_location(matched_at)
-    vuln_location2 = common.build_vuln_location(matched_at)
+    vuln_location1 = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
+    vuln_location2 = common.build_vuln_location(
+        target_url=matched_at, message=url_message
+    )
 
     assert vuln_location1 is not None
     assert vuln_location2 is not None
@@ -259,8 +304,3 @@ def testSortDict_always_returnsSortedDict(
 ) -> None:
     """Ensure sort_dict correctly sorts dictionary keys recursively."""
     assert common.sort_dict(unordered_dict) == expected
-
-
-def testBuildVulnLocation_whenTargerUrlIsNone_returnNone() -> None:
-    vuln_location = common.build_vuln_location(target_url=None)
-    assert vuln_location is None

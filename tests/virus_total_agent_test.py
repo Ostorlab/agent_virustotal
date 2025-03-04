@@ -178,7 +178,7 @@ def testVirusTotalAgent_whenVirusTotalApiReturnsValidResponse_noExceptionRaised(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"file": {"content": null, "content_url": null, "path": "some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"android_store": {"package_name": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -220,17 +220,12 @@ def testVirusTotalAgent_whenApkMessage_noExceptionRaised(
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
     assert agent_mock[0].data["vulnerability_location"] == {
-        "android_apk": {"path": "some/dummy/path"},
+        "android_store": {"package_name": "test.app.com"},
         "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"android_apk": {"content": null, "content_url": null, "path": '
-        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
-        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
-        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
-        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
-        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"android_store": {"package_name": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -272,22 +267,12 @@ def testVirusTotalAgent_whenAabMessage_noExceptionRaised(
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
     assert agent_mock[0].data["vulnerability_location"] == {
-        "android_aab": {"path": "some/dummy/path"},
+        "android_store": {"package_name": "test.app.com"},
         "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"android_aab": {"content": null, "content_url": null, "path": '
-        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
-        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
-        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
-        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
-        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
-    ) != (
-        '{"location": {"android_aab": {"content": null, "content_url": null, "path": '
-        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
-        '"some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) '
-        '(MD5 based search)"}'
+        == '{"location": {"android_store": {"package_name": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -329,22 +314,12 @@ def testVirusTotalAgent_whenIpaMessage_noExceptionRaised(
         {"title": "Virustotal", "url": "https://www.virustotal.com/"}
     ]
     assert agent_mock[0].data["vulnerability_location"] == {
-        "ios_ipa": {"path": "some/dummy/path"},
+        "ios_store": {"bundle_id": "test.app.com"},
         "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}],
     }
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": '
-        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
-        '"some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, '
-        '"update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": '
-        'true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, '
-        '"title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
-    ) != (
-        '{"location": {"ios_ipa": {"content": null, "content_url": null, "path": '
-        '"some/dummy/path"}, "metadata": [{"type": "FILE_PATH", "value": '
-        '"some/dummy/path"}]}, "title": "VirusTotal scan flagged malicious asset(s) '
-        '(MD5 based search)"}'
+        == '{"location": {"ios_store": {"bundle_id": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": "some/dummy/path"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
 
 
@@ -719,10 +694,11 @@ def testVirusTotalAgent_whenReportIsSecure_shouldReportAsSecure(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"file": {"content": null, "content_url": null, "path": null}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": false, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
+        == '{"location": {"android_store": {"package_name": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": false, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
     )
     assert agent_mock[0].data["vulnerability_location"] == {
-        "metadata": [{"type": "FILE_PATH", "value": ""}]
+        "android_store": {"package_name": "test.app.com"},
+        "metadata": [{"type": "FILE_PATH", "value": ""}],
     }
 
 
@@ -765,8 +741,9 @@ def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"file": {"content": null, "content_url": null, "path": null}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Acronis": {"detected": false, "result": null, "update": "20230828", "version": "1.2.0.121"}, "AhnLab-V3": {"detected": false, "result": null, "update": "20240305", "version": "3.25.1.10473"}, "Alibaba": {"detected": false, "result": null, "update": "20190527", "version": "0.3.0.5"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
+        == '{"location": {"android_store": {"package_name": "test.app.com"}, "metadata": [{"type": "FILE_PATH", "value": ""}]}, "scans": {"Acronis": {"detected": false, "result": null, "update": "20230828", "version": "1.2.0.121"}, "AhnLab-V3": {"detected": false, "result": null, "update": "20240305", "version": "3.25.1.10473"}, "Alibaba": {"detected": false, "result": null, "update": "20190527", "version": "0.3.0.5"}}, "title": "Secure Virustotal malware analysis (MD5 based search)"}'
     )
     assert agent_mock[0].data["vulnerability_location"] == {
-        "metadata": [{"type": "FILE_PATH", "value": ""}]
+        "android_store": {"package_name": "test.app.com"},
+        "metadata": [{"type": "FILE_PATH", "value": ""}],
     }

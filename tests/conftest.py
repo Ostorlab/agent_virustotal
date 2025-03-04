@@ -19,7 +19,11 @@ def create_scan_message() -> msg.Message:
         pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file"
-    msg_data = {"content": file_content, "path": "some/dummy/path"}
+    msg_data = {
+        "content": file_content,
+        "path": "some/dummy/path",
+        "android_metadata": {"package_name": "test.app.com"},
+    }
     return msg.Message.from_data(selector, data=msg_data)
 
 
@@ -32,7 +36,11 @@ def apk_message() -> msg.Message:
         pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file.android.apk"
-    msg_data = {"content": file_content, "path": "some/dummy/path"}
+    msg_data = {
+        "content": file_content,
+        "path": "some/dummy/path",
+        "android_metadata": {"package_name": "test.app.com"},
+    }
     return msg.Message.from_data(selector, data=msg_data)
 
 
@@ -45,7 +53,11 @@ def aab_message() -> msg.Message:
         pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file.android.aab"
-    msg_data = {"content": file_content, "path": "some/dummy/path"}
+    msg_data = {
+        "content": file_content,
+        "path": "some/dummy/path",
+        "android_metadata": {"package_name": "test.app.com"},
+    }
     return msg.Message.from_data(selector, data=msg_data)
 
 
@@ -58,7 +70,11 @@ def ios_message() -> msg.Message:
         pathlib.Path(__file__).parents[0] / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file.ios.ipa"
-    msg_data = {"content": file_content, "path": "some/dummy/path"}
+    msg_data = {
+        "content": file_content,
+        "path": "some/dummy/path",
+        "ios_metadata": {"bundle_id": "test.app.com"},
+    }
     return msg.Message.from_data(selector, data=msg_data)
 
 
@@ -167,7 +183,10 @@ def message_without_path() -> msg.Message:
         pathlib.Path(__file__).parent / "files/malicious_dummy.com"
     ).read_bytes()
     selector = "v3.asset.file"
-    msg_data = {"content": file_content}
+    msg_data = {
+        "content": file_content,
+        "android_metadata": {"package_name": "test.app.com"},
+    }
     return msg.Message.from_data(selector, data=msg_data)
 
 

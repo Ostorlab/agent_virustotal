@@ -10,10 +10,9 @@ from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.assets import domain_name as domain_asset
 from ostorlab.assets import ipv4 as ipv4_asset
 from ostorlab.assets import ipv6 as ipv6_asset
-from ostorlab.assets import file as file_asset
-from ostorlab.assets import android_apk as android_apk_asset
-from ostorlab.assets import android_aab as android_aab_asset
-from ostorlab.assets import ios_ipa as ios_ipa_asset
+from ostorlab.assets import android_store as android_store_asset
+from ostorlab.assets import ios_store as ios_store_asset
+from ostorlab.agent.message import message as msg
 
 
 def prepare_host(host: str) -> str:
@@ -78,20 +77,16 @@ def _is_ipv6(potential_ip: str) -> bool:
 
 
 def build_vuln_location(
+    message: msg.Message,
     target_url: str | None,
     file_path: str | None = None,
-    file_content: bytes | None = None,
-    selector: str | None = None,
-    content_url: str | None = None,
 ) -> agent_report_vulnerability_mixin.VulnerabilityLocation | None:
     """Build VulnerabilityLocation based on the asset.
 
     Args:
+        message: The agent message.
         target_url: The URL
         file_path: The path of the file
-        file_content: The content of the file
-        selector: The message selector
-        content_url: The content url of the file
     Returns:
         The vulnerability location object.
     """
@@ -100,53 +95,20 @@ def build_vuln_location(
         ipv4_asset.IPv4
         | ipv6_asset.IPv6
         | domain_asset.DomainName
-        | file_asset.File
-        | android_aab_asset.AndroidAab
-        | android_apk_asset.AndroidApk
-        | ios_ipa_asset.IOSIpa
-    )
+        | android_store_asset.AndroidStore
+        | ios_store_asset.IOSStore
+        | None
+    ) = None
 
-    if selector == "v3.asset.file.android.apk":
-        asset = android_apk_asset.AndroidApk(
-            path=file_path, content=file_content, content_url=content_url
-        )
-        return agent_report_vulnerability_mixin.VulnerabilityLocation(
-            asset=asset,
-            metadata=[
-                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
-                    value=file_path or "",
-                )
-            ],
-        )
-    elif selector == "v3.asset.file.android.aab":
-        asset = android_aab_asset.AndroidAab(
-            path=file_path, content=file_content, content_url=content_url
-        )
-        return agent_report_vulnerability_mixin.VulnerabilityLocation(
-            asset=asset,
-            metadata=[
-                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
-                    value=file_path or "",
-                )
-            ],
-        )
-    elif selector == "v3.asset.file.ios.ipa":
-        asset = ios_ipa_asset.IOSIpa(
-            path=file_path, content=file_content, content_url=content_url
-        )
-        return agent_report_vulnerability_mixin.VulnerabilityLocation(
-            asset=asset,
-            metadata=[
-                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=agent_report_vulnerability_mixin.MetadataType.FILE_PATH,
-                    value=file_path or "",
-                )
-            ],
-        )
-    elif selector == "v3.asset.file":
-        asset = file_asset.File(path=file_path, content=file_content)
+    if "v3.asset.file" in message.selector:
+        package_name = message.data.get("android_metadata", {}).get("package_name")
+        bundle_id = message.data.get("ios_metadata", {}).get("bundle_id")
+        if bundle_id is None and package_name is None:
+            return None
+        if bundle_id is not None:
+            asset = ios_store_asset.IOSStore(bundle_id=bundle_id)
+        if package_name is not None:
+            asset = android_store_asset.AndroidStore(package_name=package_name)
         return agent_report_vulnerability_mixin.VulnerabilityLocation(
             asset=asset,
             metadata=[
@@ -168,9 +130,9 @@ def build_vuln_location(
             potential_ip = potential_ip.replace(f"{target.scheme}://", "")
         if _is_ipv4(potential_ip) is True:
             ip, port = _split_ipv4(potential_ip)
-            asset = ipv4_asset.IPv4(host=str(ip), version=4, mask="32")
+            asset = ipv4_asset.IPv4(host=ip, version=4, mask="32")
         elif _is_ipv6(potential_ip) is True:
-            asset = ipv6_asset.IPv6(host=str(potential_ip), version=6, mask="128")
+            asset = ipv6_asset.IPv6(host=potential_ip, version=6, mask="128")
         else:
             full_url = parse.urlunparse(
                 (target.scheme, target.netloc, target.path, "", "", "")
