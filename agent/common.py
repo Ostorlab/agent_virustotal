@@ -131,20 +131,8 @@ def build_vuln_location(
         if _is_ipv4(potential_ip) is True:
             ip, port = _split_ipv4(potential_ip)
             asset = ipv4_asset.IPv4(host=ip, version=4, mask="32")
-            metadata.append(
-                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=agent_report_vulnerability_mixin.MetadataType.URL,
-                    value=f"https://{ip}",
-                )
-            )
         elif _is_ipv6(potential_ip) is True:
             asset = ipv6_asset.IPv6(host=potential_ip, version=6, mask="128")
-            metadata.append(
-                agent_report_vulnerability_mixin.VulnerabilityLocationMetadata(
-                    metadata_type=agent_report_vulnerability_mixin.MetadataType.URL,
-                    value=f"https://{potential_ip}",
-                )
-            )
         else:
             full_url = parse.urlunparse(
                 (target.scheme, target.netloc, target.path, "", "", "")

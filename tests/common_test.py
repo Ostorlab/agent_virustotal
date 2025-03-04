@@ -47,18 +47,10 @@ def testBuildVulnLocation_whenMatchedAtIsIpv4_returnsVulnLocation(
     assert ipv4_asset.host == "70.70.70.70"
     assert ipv4_asset.version == 4
     assert ipv4_asset.mask == "32"
-    assert len(vuln_location.metadata) == 2
+    assert len(vuln_location.metadata) == 1
     assert (
         any(
             metadata.metadata_type.name == "PORT" and metadata.value == "443"
-            for metadata in vuln_location.metadata
-        )
-        is True
-    )
-    assert (
-        any(
-            metadata.metadata_type.name == "URL"
-            and metadata.value == "https://70.70.70.70"
             for metadata in vuln_location.metadata
         )
         is True
@@ -81,7 +73,7 @@ def testBuildVulnLocation_whenMatchedAtIsIpv6_returnsVulnLocation(
     assert ipv6_asset.host == "2001:0db8:85a3:0000:0000:8a2e:0370:7334"
     assert ipv6_asset.version == 6
     assert ipv6_asset.mask == "128"
-    assert len(vuln_location.metadata) == 1
+    assert len(vuln_location.metadata) == 0
 
 
 def testBuildVulnLocation_whenMatchedAtIsDomain_returnsVulnLocation(
@@ -208,7 +200,7 @@ def testComputeDna_whenVulnerabilityTitleAndIpv4_returnsDna(
     assert dna is not None
     assert (
         dna
-        == '{"location": {"ipv4": {"host": "70.70.70.70", "mask": "32", "version": 4}, "metadata": [{"type": "URL", "value": "https://70.70.70.70"}]}, "title": "Vulnerability Title IPv4"}'
+        == '{"location": {"ipv4": {"host": "70.70.70.70", "mask": "32", "version": 4}, "metadata": []}, "title": "Vulnerability Title IPv4"}'
     )
 
 
@@ -227,7 +219,7 @@ def testComputeDna_whenVulnerabilityTitleAndIpv6_returnsDna(
     assert dna is not None
     assert (
         dna
-        == '{"location": {"ipv6": {"host": "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "mask": "128", "version": 6}, "metadata": [{"type": "URL", "value": "https://2001:0db8:85a3:0000:0000:8a2e:0370:7334"}]}, "title": "Vulnerability Title IPv6"}'
+        == '{"location": {"ipv6": {"host": "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "mask": "128", "version": 6}, "metadata": []}, "title": "Vulnerability Title IPv6"}'
     )
 
 

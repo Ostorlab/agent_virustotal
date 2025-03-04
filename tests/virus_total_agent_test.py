@@ -484,11 +484,10 @@ def testVirusTotalAgent_whenApisReceived_virusTotalApiReturnsValidResponse(
     ]
     assert (
         agent_mock[0].data["dna"]
-        == '{"location": {"ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4}, "metadata": [{"type": "URL", "value": "https://209.235.136.113"}]}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
+        == '{"location": {"ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4}, "metadata": []}, "scans": {"Bkav": {"detected": false, "result": null, "update": "20220107", "version": "1.3.0.9899"}, "Elastic": {"detected": true, "result": "eicar", "update": "20211223", "version": "4.0.32"}}, "title": "VirusTotal scan flagged malicious asset(s) (MD5 based search)"}'
     )
     assert agent_mock[0].data["vulnerability_location"] == {
-        "ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4},
-        "metadata": [{"type": "URL", "value": "https://209.235.136.113"}],
+        "ipv4": {"host": "209.235.136.113", "mask": "32", "version": 4}
     }
 
 
