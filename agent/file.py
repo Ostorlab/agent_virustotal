@@ -13,9 +13,9 @@ NUMBER_RETRIES = 3
 @tenacity.retry(
     stop=tenacity.stop_after_attempt(NUMBER_RETRIES),
     retry=tenacity.retry_if_exception_type(),
-    retry_error_callback=lambda retry_state: retry_state.outcome.result()
-    if retry_state.outcome is not None
-    else None,
+    retry_error_callback=lambda retry_state: (
+        retry_state.outcome.result() if retry_state.outcome is not None else None
+    ),
 )
 def _download_file(file_url: str) -> bytes | None:
     """Download a file.
