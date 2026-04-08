@@ -39,4 +39,4 @@ def table_markdown(data: list[list[str]]) -> str:
     table = markdown_writer.stream.getvalue()
     table = table.replace("\n", "  \n")  # Two spaces \n for a new line  in markdown.
 
-    return table
+    return str(table)
