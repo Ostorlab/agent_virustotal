@@ -42,4 +42,3 @@ jobs:
     - name: Runnning tests with pytest.
       run: |
         pytest -m "not docker"
-    - name: Upload coverage to Codecov.
