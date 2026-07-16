@@ -773,9 +773,7 @@ def testVirusTotalAgent_whenFilePathIsNotExcluded_processMessage(
     virustotal_agent_with_exclude_paths: virus_total_agent.VirusTotalAgent,
 ) -> None:
     """A file whose path does not match any exclude pattern is scanned normally."""
-    scan_mock = mocker.patch(
-        "agent.virustotal.scan_file_from_message", return_value={}
-    )
+    scan_mock = mocker.patch("agent.virustotal.scan_file_from_message", return_value={})
     process_response_mock = mocker.patch.object(
         virustotal_agent_with_exclude_paths, "_process_response"
     )
