@@ -139,8 +139,8 @@ def create_virustotal_agent(
         return agent
 
 
-@pytest.fixture(name="virustotal_agent_with_exclude_paths")
-def create_virustotal_agent_with_exclude_paths(
+@pytest.fixture(name="virustotal_agent_with_exclude_path_regexes")
+def create_virustotal_agent_with_exclude_path_regexes(
     agent_mock: list[msg.Message],
     agent_persist_mock: dict[str | bytes, str | bytes],
 ) -> virus_total_agent.VirusTotalAgent:
@@ -156,7 +156,7 @@ def create_virustotal_agent_with_exclude_paths(
                 "description": "Api key for the virus total API.",
             },
             {
-                "name": "exclude_paths",
+                "name": "exclude_path_regexes",
                 "type": "array",
                 "value": [r"^/workspace(/|$)"],
                 "description": "List of regex patterns to skip by path.",

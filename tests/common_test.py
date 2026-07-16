@@ -355,3 +355,12 @@ def testShouldExcludePath_whenRegexIsInvalid_shouldSkipPatternAndReturnFalse() -
     result = common.should_exclude_path("/workspace/a.py", ["[invalid("])
 
     assert result is False
+
+
+def testShouldExcludePath_whenInvalidRegexPrecedesValidMatch_shouldReturnTrue() -> None:
+    """An invalid pattern is skipped and a later valid pattern still matches."""
+    result = common.should_exclude_path(
+        "/workspace/a.py", ["[invalid(", r"^/workspace(/|$)"]
+    )
+
+    assert result is True

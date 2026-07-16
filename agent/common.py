@@ -19,24 +19,26 @@ from ostorlab.agent.message import message as msg
 logger = logging.getLogger(__name__)
 
 
-def should_exclude_path(path: str | None, exclude_paths: list[str] | None) -> bool:
+def should_exclude_path(
+    path: str | None, exclude_path_regexes: list[str] | None
+) -> bool:
     """Report whether a file path matches one of the exclusion regex patterns.
 
     Args:
         path: The file path reported in the message, or None.
-        exclude_paths: List of regex patterns to match against the path.
+        exclude_path_regexes: List of regex patterns to match against the path.
 
     Returns:
         True if the path matches at least one pattern and should be skipped,
         False otherwise.
     """
-    if path is None or exclude_paths is None or len(exclude_paths) == 0:
+    if path is None or exclude_path_regexes is None or len(exclude_path_regexes) == 0:
         return False
-    for pattern in exclude_paths:
+    for pattern in exclude_path_regexes:
         try:
             matched = re.search(pattern, path)
         except re.error as e:
-            logger.warning("Invalid exclude_paths regex %r: %s", pattern, e)
+            logger.warning("Invalid exclude_path_regexes regex %r: %s", pattern, e)
             continue
         if matched is not None:
             logger.info(

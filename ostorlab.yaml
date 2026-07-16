@@ -87,7 +87,7 @@ args:
   - name: "enable_whitelist"
     type: "array"
     description: "List of mimetypes types to whitelist for scanning."
-  - name: "exclude_paths"
+  - name: "exclude_path_regexes"
     type: "array"
     description: "List of regex patterns; files whose path matches any pattern are skipped."
 docker_file_path: Dockerfile

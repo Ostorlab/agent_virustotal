@@ -69,7 +69,7 @@ class VirusTotalAgent(
         if (
             message.selector.startswith("v3.asset.file") is True
             and common.should_exclude_path(
-                message.data.get("path"), self.args.get("exclude_paths")
+                message.data.get("path"), self.args.get("exclude_path_regexes")
             )
             is True
         ):
