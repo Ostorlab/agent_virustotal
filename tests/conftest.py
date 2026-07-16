@@ -139,6 +139,36 @@ def create_virustotal_agent(
         return agent
 
 
+@pytest.fixture(name="virustotal_agent_with_exclude_paths")
+def create_virustotal_agent_with_exclude_paths(
+    agent_mock: list[msg.Message],
+    agent_persist_mock: dict[str | bytes, str | bytes],
+) -> virus_total_agent.VirusTotalAgent:
+    """Instantiate a virustotal agent that excludes files under /workspace."""
+    del agent_mock, agent_persist_mock
+    with (pathlib.Path(__file__).parent.parent / "ostorlab.yaml").open() as yaml_o:
+        definition = agent_definitions.AgentDefinition.from_yaml(yaml_o)
+        definition.args = [
+            {
+                "name": "api_key",
+                "type": "string",
+                "value": "some_api_key",
+                "description": "Api key for the virus total API.",
+            },
+            {
+                "name": "exclude_paths",
+                "type": "array",
+                "value": [r"^/workspace(/|$)"],
+                "description": "List of regex patterns to skip by path.",
+            },
+        ]
+        settings = runtime_definitions.AgentSettings(
+            key="agent/ostorlab/agent_virustotal_key",
+            redis_url="redis://guest:guest@localhost:6379",
+        )
+        return virus_total_agent.VirusTotalAgent(definition, settings)
+
+
 @pytest.fixture
 def virustotal_agent_with_whitelist() -> virus_total_agent.VirusTotalAgent:
     """Instantiate a virustotal agent."""
