@@ -69,6 +69,13 @@ class VirusTotalAgent(
         file_content = file.get_file_content(message)
         if file_content is not None:
             if (
+                common.should_exclude_path(
+                    message.data.get("path"), self.args.get("exclude_paths")
+                )
+                is True
+            ):
+                return None
+            if (
                 len(self.whitelist_types) != 0
                 and magic.from_buffer(file_content, mime=True)
                 not in self.whitelist_types

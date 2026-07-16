@@ -2,6 +2,7 @@
 
 import ipaddress
 import json
+import logging
 from typing import cast, Any
 from urllib import parse
 
@@ -13,6 +14,30 @@ from ostorlab.assets import ipv6 as ipv6_asset
 from ostorlab.assets import android_store as android_store_asset
 from ostorlab.assets import ios_store as ios_store_asset
 from ostorlab.agent.message import message as msg
+
+logger = logging.getLogger(__name__)
+
+
+def should_exclude_path(path: str | None, exclude_paths: list[str] | None) -> bool:
+    """Report whether a file path starts with one of the excluded prefixes.
+
+    Args:
+        path: The file path reported in the message, or None.
+        exclude_paths: List of path prefixes to match against the path.
+
+    Returns:
+        True if the path starts with at least one prefix and should be skipped,
+        False otherwise.
+    """
+    if path is None or exclude_paths is None or len(exclude_paths) == 0:
+        return False
+    for prefix in exclude_paths:
+        if path.startswith(prefix) is True:
+            logger.info(
+                "Skipping file %s: path matches exclude prefix %r.", path, prefix
+            )
+            return True
+    return False
 
 
 def prepare_host(host: str) -> str:
