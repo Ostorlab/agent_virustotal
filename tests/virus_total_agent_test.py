@@ -765,3 +765,26 @@ def testVirusTotalAgent_whenFilePathIsExcluded_notProcessMessage(
 
     assert scan_mock.call_count == 0
     assert len(agent_mock) == 0
+
+
+def testVirusTotalAgent_whenFilePathIsNotExcluded_processMessage(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent_with_exclude_paths: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """A file whose path does not match any exclude pattern is scanned normally."""
+    scan_mock = mocker.patch(
+        "agent.virustotal.scan_file_from_message", return_value={}
+    )
+    process_response_mock = mocker.patch.object(
+        virustotal_agent_with_exclude_paths, "_process_response"
+    )
+    message = msg.Message.from_data(
+        selector="v3.asset.file",
+        data={"content": b"some content", "path": "/tmp/file.bin"},
+    )
+
+    virustotal_agent_with_exclude_paths.process(message)
+
+    assert scan_mock.call_count == 1
+    assert process_response_mock.call_count == 1
