@@ -304,3 +304,63 @@ def testSortDict_always_returnsSortedDict(
 ) -> None:
     """Ensure sort_dict correctly sorts dictionary keys recursively."""
     assert common.sort_dict(unordered_dict) == expected
+
+
+def testShouldExcludePath_whenPathMatchesPattern_shouldReturnTrue() -> None:
+    """A path matching an exclude pattern returns True."""
+    result = common.should_exclude_path("/workspace/src/main.py", [r"^/workspace(/|$)"])
+
+    assert result is True
+
+
+def testShouldExcludePath_whenPathDoesNotMatch_shouldReturnFalse() -> None:
+    """A path not matching any pattern returns False."""
+    result = common.should_exclude_path("/tmp/main.py", [r"^/workspace(/|$)"])
+
+    assert result is False
+
+
+def testShouldExcludePath_whenSimilarPrefixNotUnderWorkspace_shouldReturnFalse() -> (
+    None
+):
+    """A lookalike path is not excluded by the anchored pattern."""
+    result = common.should_exclude_path("/workspace_backup/a.py", [r"^/workspace(/|$)"])
+
+    assert result is False
+
+
+def testShouldExcludePath_whenPathIsNone_shouldReturnFalse() -> None:
+    """A None path is never excluded."""
+    result = common.should_exclude_path(None, [r"^/workspace(/|$)"])
+
+    assert result is False
+
+
+def testShouldExcludePath_whenExcludePathsIsEmpty_shouldReturnFalse() -> None:
+    """An empty pattern list excludes nothing."""
+    result = common.should_exclude_path("/workspace/a.py", [])
+
+    assert result is False
+
+
+def testShouldExcludePath_whenExcludePathsIsNone_shouldReturnFalse() -> None:
+    """A None pattern list excludes nothing."""
+    result = common.should_exclude_path("/workspace/a.py", None)
+
+    assert result is False
+
+
+def testShouldExcludePath_whenRegexIsInvalid_shouldSkipPatternAndReturnFalse() -> None:
+    """An invalid regex pattern is skipped instead of raising."""
+    result = common.should_exclude_path("/workspace/a.py", ["[invalid("])
+
+    assert result is False
+
+
+def testShouldExcludePath_whenInvalidRegexPrecedesValidMatch_shouldReturnTrue() -> None:
+    """An invalid pattern is skipped and a later valid pattern still matches."""
+    result = common.should_exclude_path(
+        "/workspace/a.py", ["[invalid(", r"^/workspace(/|$)"]
+    )
+
+    assert result is True

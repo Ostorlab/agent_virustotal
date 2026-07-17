@@ -747,3 +747,42 @@ def testVirusTotalAgent_whenScannerIsExcluded_shouldNotBeConsidered(
         "android_store": {"package_name": "test.app.com"},
         "metadata": [{"type": "FILE_PATH", "value": ""}],
     }
+
+
+def testVirusTotalAgent_whenFilePathIsExcluded_notProcessMessage(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent_with_exclude_path_regexes: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """A file whose path matches an exclude pattern is skipped: no scan, no emitted message."""
+    scan_mock = mocker.patch("agent.virustotal.scan_file_from_message")
+    message = msg.Message.from_data(
+        selector="v3.asset.file",
+        data={"content": b"some content", "path": "/workspace/file.bin"},
+    )
+
+    virustotal_agent_with_exclude_path_regexes.process(message)
+
+    assert scan_mock.call_count == 0
+    assert len(agent_mock) == 0
+
+
+def testVirusTotalAgent_whenFilePathIsNotExcluded_processMessage(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent_with_exclude_path_regexes: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """A file whose path does not match any exclude pattern is scanned and reported."""
+    mocker.patch(
+        "virus_total_apis.PublicApi.get_file_report",
+        side_effect=virustotal_valid_response,
+    )
+    message = msg.Message.from_data(
+        selector="v3.asset.file",
+        data={"content": b"some content", "path": "/tmp/file.bin"},
+    )
+
+    virustotal_agent_with_exclude_path_regexes.process(message)
+
+    assert len(agent_mock) == 1
+    assert agent_mock[0].selector == "v3.report.vulnerability"

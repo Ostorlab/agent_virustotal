@@ -66,6 +66,15 @@ class VirusTotalAgent(
         Raises:
             NameError: In case the scans were not defined.
         """
+        if (
+            message.selector.startswith("v3.asset.file") is True
+            and common.should_exclude_path(
+                message.data.get("path"), self.args.get("exclude_path_regexes")
+            )
+            is True
+        ):
+            return None
+
         file_content = file.get_file_content(message)
         if file_content is not None:
             if (
