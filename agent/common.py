@@ -4,17 +4,17 @@ import ipaddress
 import json
 import logging
 import re
-from typing import cast, Any
+from typing import Any, cast
 from urllib import parse
 
 import tld
+from ostorlab.agent.message import message as msg
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
+from ostorlab.assets import android_store as android_store_asset
 from ostorlab.assets import domain_name as domain_asset
+from ostorlab.assets import ios_store as ios_store_asset
 from ostorlab.assets import ipv4 as ipv4_asset
 from ostorlab.assets import ipv6 as ipv6_asset
-from ostorlab.assets import android_store as android_store_asset
-from ostorlab.assets import ios_store as ios_store_asset
-from ostorlab.agent.message import message as msg
 
 logger = logging.getLogger(__name__)
 

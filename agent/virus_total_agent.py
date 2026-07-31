@@ -3,21 +3,18 @@
 import hashlib
 import ipaddress
 import logging
-from typing import Any
-from typing import cast
+from typing import Any, cast
 
 import magic
-from ostorlab.agent import agent, definitions as agent_definitions
+from ostorlab.agent import agent
+from ostorlab.agent import definitions as agent_definitions
 from ostorlab.agent.kb import kb
 from ostorlab.agent.message import message as msg
 from ostorlab.agent.mixins import agent_report_vulnerability_mixin
 from ostorlab.runtimes import definitions as runtime_definitions
 from rich import logging as rich_logging
 
-from agent import file
-from agent import process_scans
-from agent import virustotal
-from agent import common
+from agent import common, file, process_scans, virustotal
 
 logging.basicConfig(
     format="%(message)s",
@@ -73,7 +70,7 @@ class VirusTotalAgent(
             )
             is True
         ):
-            return None
+            return
 
         file_content = file.get_file_content(message)
         if file_content is not None:
@@ -82,7 +79,7 @@ class VirusTotalAgent(
                 and magic.from_buffer(file_content, mime=True)
                 not in self.whitelist_types
             ):
-                return None
+                return
             response = virustotal.scan_file_from_message(
                 file_content=file_content, api_key=self.api_key
             )

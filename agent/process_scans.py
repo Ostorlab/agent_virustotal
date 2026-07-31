@@ -2,7 +2,6 @@
 
 from typing import Any
 
-
 from agent import markdown
 
 # These are tools used by VirusTotal to scan files that report a big
