@@ -1,7 +1,7 @@
 """Module responsible for markdown formatting."""
 
-from typing import Any
 import io
+from typing import Any
 
 from pytablewriter import MarkdownTableWriter
 

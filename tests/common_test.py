@@ -3,10 +3,8 @@
 from typing import Any
 
 import pytest
-from ostorlab.assets import domain_name
-from ostorlab.assets import ipv4
-from ostorlab.assets import ipv6
 from ostorlab.agent.message import message as msg
+from ostorlab.assets import domain_name, ipv4, ipv6
 
 from agent import common
 

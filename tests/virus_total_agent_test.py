@@ -9,8 +9,7 @@ import requests_mock as rq_mock
 from ostorlab.agent.message import message as msg
 from pytest_mock import plugin
 
-from agent import virus_total_agent
-from agent import virustotal
+from agent import virus_total_agent, virustotal
 
 SECURE_VALID_RESPONSE = {
     "results": {
