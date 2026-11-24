@@ -498,16 +498,13 @@ def testVirusTotalAgent_whenWhitelistTypesIsSet_agentShouldIgnoreNonWhitelisted(
     requests_mock: rq_mock.mocker.Mocker,
 ) -> None:
     """Test when file is not whitelisted, agent should not call the Virus Total public API."""
-    dummy_zip = pathlib.Path(__file__).parent / "files/dummy1.txt"
-    zip_message = msg.Message.from_data(
-        "v3.asset.file", data={"content": dummy_zip.read_bytes()}
-    )
+    mocker.patch("agent.virus_total_agent.magic.from_buffer", return_value="text/plain")
     virustotal_call = requests_mock.get(
         re.compile("https://www.virustotal.com/vtapi/v2/file/*"),
         json=virustotal_url_valid_response,
     )
 
-    virustotal_agent_with_whitelist.process(zip_message)
+    virustotal_agent_with_whitelist.process(message)
 
     assert virustotal_call.called is False
 
@@ -520,6 +517,10 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
     requests_mock: rq_mock.mocker.Mocker,
 ) -> None:
     """Test when file whitelisted, agent should call the Virus Total public API."""
+    # ZIP detection from bytes depends on the system libmagic version.
+    mocker.patch(
+        "agent.virus_total_agent.magic.from_buffer", return_value="application/zip"
+    )
     dummy_zip = pathlib.Path(__file__).parent / "files/dummy.zip"
     zip_message = msg.Message.from_data(
         "v3.asset.file", data={"content": dummy_zip.read_bytes()}
