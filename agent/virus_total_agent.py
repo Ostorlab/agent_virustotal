@@ -73,6 +73,14 @@ class VirusTotalAgent(
             return
 
         file_content = file.get_file_content(message)
+        if file_content is not None and len(file_content) == 0:
+            logger.info(
+                "Skipping empty file %s: no analyzable content; the VirusTotal record for the "
+                "zero-byte hash is the empty-file entry, so a verdict on it would not describe "
+                "the actual file.",
+                message.data.get("path"),
+            )
+            return
         if file_content is not None:
             if (
                 len(self.whitelist_types) != 0

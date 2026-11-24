@@ -766,6 +766,32 @@ def testVirusTotalAgent_whenFilePathIsExcluded_notProcessMessage(
     assert len(agent_mock) == 0
 
 
+def testVirusTotalAgent_whenFileContentIsEmpty_shouldNotScanOrReport(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """An empty file carries the zero-byte hash, which VirusTotal resolves to the empty-file
+    entry (SHA-256 e3b0c442...): a verdict on it does not describe the actual file, so the
+    agent skips the scan and reports nothing."""
+    scan_mock = mocker.patch("agent.virustotal.scan_file_from_message")
+    message = msg.Message.from_data(
+        selector="v3.asset.file",
+        data={
+            "content": b"",
+            "path": "Payload/SmartFormReaderPro.app/ja_JP_w_onlineFine.res.mmf",
+            "ios_metadata": {
+                "bundle_id": "com.fujitsu.pfu.BIPSmart.SmartFormReaderPro"
+            },
+        },
+    )
+
+    virustotal_agent.process(message)
+
+    assert scan_mock.call_count == 0
+    assert len(agent_mock) == 0
+
+
 def testVirusTotalAgent_whenFilePathIsNotExcluded_processMessage(
     mocker: plugin.MockerFixture,
     agent_mock: list[msg.Message],
