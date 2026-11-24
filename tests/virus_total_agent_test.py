@@ -498,16 +498,13 @@ def testVirusTotalAgent_whenWhitelistTypesIsSet_agentShouldIgnoreNonWhitelisted(
     requests_mock: rq_mock.mocker.Mocker,
 ) -> None:
     """Test when file is not whitelisted, agent should not call the Virus Total public API."""
-    dummy_zip = pathlib.Path(__file__).parent / "files/dummy1.txt"
-    zip_message = msg.Message.from_data(
-        "v3.asset.file", data={"content": dummy_zip.read_bytes()}
-    )
+    mocker.patch("agent.virus_total_agent.magic.from_buffer", return_value="text/plain")
     virustotal_call = requests_mock.get(
         re.compile("https://www.virustotal.com/vtapi/v2/file/*"),
         json=virustotal_url_valid_response,
     )
 
-    virustotal_agent_with_whitelist.process(zip_message)
+    virustotal_agent_with_whitelist.process(message)
 
     assert virustotal_call.called is False
 
@@ -520,6 +517,10 @@ def testVirusTotalAgent_whenFileIsWhitelisted_agentShouldScanFile(
     requests_mock: rq_mock.mocker.Mocker,
 ) -> None:
     """Test when file whitelisted, agent should call the Virus Total public API."""
+    # ZIP detection from bytes depends on the system libmagic version.
+    mocker.patch(
+        "agent.virus_total_agent.magic.from_buffer", return_value="application/zip"
+    )
     dummy_zip = pathlib.Path(__file__).parent / "files/dummy.zip"
     zip_message = msg.Message.from_data(
         "v3.asset.file", data={"content": dummy_zip.read_bytes()}
@@ -761,6 +762,32 @@ def testVirusTotalAgent_whenFilePathIsExcluded_notProcessMessage(
     )
 
     virustotal_agent_with_exclude_path_regexes.process(message)
+
+    assert scan_mock.call_count == 0
+    assert len(agent_mock) == 0
+
+
+def testVirusTotalAgent_whenFileContentIsEmpty_shouldNotScanOrReport(
+    mocker: plugin.MockerFixture,
+    agent_mock: list[msg.Message],
+    virustotal_agent: virus_total_agent.VirusTotalAgent,
+) -> None:
+    """An empty file carries the zero-byte hash, which VirusTotal resolves to the empty-file
+    entry (SHA-256 e3b0c442...): a verdict on it does not describe the actual file, so the
+    agent skips the scan and reports nothing."""
+    scan_mock = mocker.patch("agent.virustotal.scan_file_from_message")
+    message = msg.Message.from_data(
+        selector="v3.asset.file",
+        data={
+            "content": b"",
+            "path": "Payload/SmartFormReaderPro.app/ja_JP_w_onlineFine.res.mmf",
+            "ios_metadata": {
+                "bundle_id": "com.fujitsu.pfu.BIPSmart.SmartFormReaderPro"
+            },
+        },
+    )
+
+    virustotal_agent.process(message)
 
     assert scan_mock.call_count == 0
     assert len(agent_mock) == 0
